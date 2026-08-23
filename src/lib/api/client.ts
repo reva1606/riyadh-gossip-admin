@@ -5,6 +5,8 @@ import axios, {
 } from "axios";
 
 import { env } from "@/config/env";
+import type { ApiResponse } from "@/types/api.types";
+import type { RefreshTokenResponse } from "@/types/auth.types";
 
 import { API_ENDPOINTS, PUBLIC_ENDPOINTS } from "./endpoints";
 import { toApiError } from "./api-error";
@@ -58,14 +60,14 @@ async function refreshAccessToken(): Promise<boolean> {
     if (!refreshToken) return false;
 
     try {
-      const { data } = await refreshHttp.post(API_ENDPOINTS.auth.refresh, { refreshToken });
-      const accessToken: string | undefined = data?.data?.accessToken ?? data?.accessToken;
-      const nextRefreshToken: string =
-        data?.data?.refreshToken ?? data?.refreshToken ?? refreshToken;
+      const { data } = await refreshHttp.post<ApiResponse<RefreshTokenResponse>>(
+        API_ENDPOINTS.auth.refresh,
+        { refresh_token: refreshToken },
+      );
+      const { access_token, refresh_token } = data.data;
+      if (!access_token) return false;
 
-      if (!accessToken) return false;
-
-      tokenManager.setSession(accessToken, nextRefreshToken, tokenManager.isRemembered());
+      tokenManager.setSession(access_token, refresh_token ?? refreshToken, tokenManager.isRemembered());
       return true;
     } catch {
       return false;

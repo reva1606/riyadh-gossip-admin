@@ -5,13 +5,14 @@ import type { ApiErrorResponse } from "@/types/api.types";
 /** Normalized shape every failed request surfaces as, regardless of cause. */
 export class ApiError extends Error {
   readonly statusCode?: number;
-  readonly fieldErrors: Record<string, string[]>;
+  /** The backend's `error` field (e.g. "Bad Request"), when present. */
+  readonly errorCode?: string;
 
-  constructor(message: string, statusCode?: number, fieldErrors: Record<string, string[]> = {}) {
+  constructor(message: string, statusCode?: number, errorCode?: string) {
     super(message);
     this.name = "ApiError";
     this.statusCode = statusCode;
-    this.fieldErrors = fieldErrors;
+    this.errorCode = errorCode;
   }
 
   get isUnauthorized() {
@@ -19,7 +20,7 @@ export class ApiError extends Error {
   }
 
   get isValidation() {
-    return this.statusCode === 422 || this.statusCode === 400;
+    return this.statusCode === 400;
   }
 }
 
@@ -32,8 +33,10 @@ export function toApiError(error: unknown): ApiError {
     }
 
     const body = error.response?.data as ApiErrorResponse | undefined;
-    const message = body?.message ?? error.message ?? "Something went wrong. Please try again.";
-    return new ApiError(message, error.response?.status, body?.errors ?? {});
+    const rawMessage = body?.message ?? error.message ?? "Something went wrong. Please try again.";
+    // Validation failures (400s from class-validator) come back as string[].
+    const message = Array.isArray(rawMessage) ? rawMessage.join(" ") : rawMessage;
+    return new ApiError(message, error.response?.status ?? body?.statusCode, body?.error);
   }
 
   if (error instanceof Error) return new ApiError(error.message);

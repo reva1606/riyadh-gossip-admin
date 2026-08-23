@@ -33,6 +33,14 @@ export default function LoginPage() {
 
   function onSubmit(values: LoginFormValues) {
     login.mutate(values, {
+      onSuccess: (user) => {
+        if (user.must_change_password) {
+          toast("You're signed in with a temporary password — please change it in Settings.", {
+            icon: "⚠️",
+            duration: 6000,
+          });
+        }
+      },
       onError: (error) => toast.error(toApiError(error).message),
     });
   }

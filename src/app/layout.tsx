@@ -17,10 +17,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Glitch404 Admin",
-    template: "%s · Glitch404 Admin",
+    default: "Riyadh Gossip Admin",
+    template: "%s · Riyadh Gossip Admin",
   },
-  description: "Admin panel for the Glitch404 entertainment platform.",
+  description: "Admin panel for the Riyadh Gossip entertainment platform.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

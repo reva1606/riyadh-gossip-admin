@@ -1,31 +1,48 @@
-import type { User } from "./user.types";
+import type { AuthenticatedUser, User } from "./user.types";
 
 export interface LoginRequest {
   email: string;
   password: string;
 }
 
+/** `POST /auth/login` returns the plain `UserResponseDto` — no roles/permissions yet. */
 export interface LoginResponse {
+  access_token: string;
+  refresh_token: string;
   user: User;
-  accessToken: string;
-  refreshToken: string;
 }
 
 export interface RefreshTokenRequest {
-  refreshToken: string;
+  refresh_token: string;
 }
 
 export interface RefreshTokenResponse {
-  accessToken: string;
-  refreshToken: string;
+  access_token: string;
+  refresh_token: string;
 }
+
+/** `GET /auth/profile` — the full authenticated-user shape the auth store keeps. */
+export type ProfileResponse = AuthenticatedUser;
 
 export interface ForgotPasswordRequest {
   email: string;
 }
 
-export interface ResetPasswordRequest {
+export interface VerifyResetOtpRequest {
   email: string;
   otp: string;
-  newPassword: string;
+}
+
+export interface VerifyResetOtpResponse {
+  reset_token: string;
+}
+
+export interface ResetPasswordRequest {
+  reset_token: string;
+  password: string;
+}
+
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
 }

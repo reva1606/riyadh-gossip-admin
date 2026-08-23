@@ -1,29 +1,29 @@
-/**
- * Baseline role set for the admin panel. The full Roles & Permissions module
- * (custom roles, a permission matrix) lands separately — this is the minimal
- * shape auth/RBAC needs now: a role name plus the granular permission keys
- * it carries.
- */
-export type RoleName = "super_admin" | "admin" | "manager" | "staff";
+/** Mirrors the backend's `RoleDto`. Roles are a dynamic catalog, not a fixed union. */
+export interface RoleDto {
+  id: number;
+  name: string;
+  description: string | null;
+  is_system: boolean;
+}
 
-export type Permission =
-  | "staff:read"
-  | "staff:write"
-  | "staff:delete"
-  | "roles:read"
-  | "roles:write"
-  | "events:read"
-  | "events:write"
-  | "bookings:read"
-  | "bookings:write"
-  | "tickets:read"
-  | "tickets:write"
-  | "settings:read"
-  | "settings:write";
+export interface CreateRolePayload {
+  name: string;
+  description?: string;
+}
 
-export interface Role {
-  id: string;
-  name: RoleName;
-  label: string;
-  permissions: Permission[];
+export interface UpdateRolePayload {
+  name?: string;
+  description?: string;
+}
+
+/** Mirrors the backend's `PermissionDto`. Read-only seeded catalog. */
+export interface PermissionDto {
+  id: number;
+  name: string;
+  module: string;
+  description: string | null;
+}
+
+export interface AssignRolePermissionPayload {
+  permission_id: number;
 }

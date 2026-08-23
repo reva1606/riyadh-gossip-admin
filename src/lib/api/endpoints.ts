@@ -3,9 +3,34 @@ export const API_ENDPOINTS = {
     login: "/auth/login",
     refresh: "/auth/refresh",
     logout: "/auth/logout",
+    logoutAll: "/auth/logout-all",
     forgotPassword: "/auth/forgot-password",
+    verifyResetOtp: "/auth/verify-reset-otp",
     resetPassword: "/auth/reset-password",
-    me: "/auth/me",
+    changePassword: "/auth/change-password",
+    profile: "/auth/profile",
+  },
+  users: {
+    list: "/users",
+    detail: (id: number | string) => `/users/${id}`,
+    activate: (id: number | string) => `/users/${id}/activate`,
+    deactivate: (id: number | string) => `/users/${id}/deactivate`,
+    roles: (id: number | string) => `/users/${id}/roles`,
+    removeRole: (id: number | string, roleId: number | string) => `/users/${id}/roles/${roleId}`,
+  },
+  roles: {
+    list: "/roles",
+    detail: (id: number | string) => `/roles/${id}`,
+    permissions: (id: number | string) => `/roles/${id}/permissions`,
+    removePermission: (id: number | string, permissionId: number | string) =>
+      `/roles/${id}/permissions/${permissionId}`,
+  },
+  // Only account creation goes through /staff now — see staff.service.ts.
+  staff: {
+    list: "/staff",
+  },
+  permissions: {
+    list: "/permissions",
   },
 } as const;
 
@@ -14,5 +39,6 @@ export const PUBLIC_ENDPOINTS: string[] = [
   API_ENDPOINTS.auth.login,
   API_ENDPOINTS.auth.refresh,
   API_ENDPOINTS.auth.forgotPassword,
+  API_ENDPOINTS.auth.verifyResetOtp,
   API_ENDPOINTS.auth.resetPassword,
 ];

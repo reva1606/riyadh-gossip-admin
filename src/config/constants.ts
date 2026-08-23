@@ -1,4 +1,4 @@
-export const APP_NAME = "Glitch404" as const;
+export const APP_NAME = "Riyadh Gossip" as const;
 
 /** localStorage/sessionStorage keys used by the token manager. */
 export const STORAGE_KEYS = {
@@ -11,4 +11,9 @@ export const SESSION_COOKIE = "glitch404_session";
 
 export const QUERY_KEYS = {
   currentUser: ["auth", "current-user"] as const,
+  users: ["users"] as const,
+  userRoles: (userId: number) => ["users", userId, "roles"] as const,
+  roles: ["roles"] as const,
+  rolePermissions: (roleId: number) => ["roles", roleId, "permissions"] as const,
+  permissions: ["permissions"] as const,
 };

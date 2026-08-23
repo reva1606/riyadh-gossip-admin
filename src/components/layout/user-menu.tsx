@@ -5,7 +5,7 @@ import { LogOut, Settings, User as UserIcon } from "lucide-react";
 
 import { ROUTES } from "@/config/routes";
 import { useAuth } from "@/store/auth-context";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,28 +22,28 @@ function getInitials(firstName?: string, lastName?: string) {
 
 export function UserMenu() {
   const { user, logout } = useAuth();
+  const primaryRole = user?.roles[0];
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-10 gap-2 px-1.5">
           <Avatar>
-            <AvatarImage src={user?.avatarUrl ?? undefined} alt={user?.firstName} />
-            <AvatarFallback>{getInitials(user?.firstName, user?.lastName)}</AvatarFallback>
+            <AvatarFallback>{getInitials(user?.first_name, user?.last_name)}</AvatarFallback>
           </Avatar>
           <div className="hidden text-left leading-tight md:block">
             <p className="text-sm font-medium">
-              {user ? `${user.firstName} ${user.lastName}` : "—"}
+              {user ? `${user.first_name} ${user.last_name}` : "—"}
             </p>
             <p className="text-xs text-muted-foreground capitalize">
-              {user?.role.replace("_", " ") ?? ""}
+              {primaryRole ? primaryRole.replace(/_/g, " ").toLowerCase() : ""}
             </p>
           </div>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="font-normal">
-          <p className="text-sm font-medium">{user ? `${user.firstName} ${user.lastName}` : ""}</p>
+          <p className="text-sm font-medium">{user ? `${user.first_name} ${user.last_name}` : ""}</p>
           <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

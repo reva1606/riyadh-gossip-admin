@@ -9,20 +9,22 @@ import { ROUTES } from "@/config/routes";
 import { authService } from "@/services/auth.service";
 import { tokenManager } from "@/lib/api/token-manager";
 import { toApiError } from "@/lib/api/api-error";
-import type { Permission, RoleName } from "@/types/role.types";
-import type { User } from "@/types/user.types";
+import type { AuthenticatedUser } from "@/types/user.types";
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
+/** Any role in this set bypasses every permission check, mirroring the backend's own bypass. */
+const SUPER_ADMIN_ROLE = "SUPER_ADMIN";
+
 interface AuthContextValue {
   status: AuthStatus;
-  user: User | null;
+  user: AuthenticatedUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string, rememberMe: boolean) => Promise<User>;
+  login: (email: string, password: string, rememberMe: boolean) => Promise<AuthenticatedUser>;
   logout: () => Promise<void>;
-  hasRole: (...roles: RoleName[]) => boolean;
-  hasPermission: (...permissions: Permission[]) => boolean;
+  hasRole: (...roles: string[]) => boolean;
+  hasPermission: (...permissions: string[]) => boolean;
 }
 
 const AuthContext = React.createContext<AuthContextValue | null>(null);
@@ -30,7 +32,7 @@ const AuthContext = React.createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [status, setStatus] = React.useState<AuthStatus>("loading");
-  const [user, setUser] = React.useState<User | null>(null);
+  const [user, setUser] = React.useState<AuthenticatedUser | null>(null);
 
   const handleSessionEnd = React.useCallback(() => {
     setUser(null);
@@ -78,18 +80,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [handleSessionEnd]);
 
   const login = React.useCallback(async (email: string, password: string, rememberMe: boolean) => {
-    const { user: loggedInUser, accessToken, refreshToken } = await authService.login({
-      email,
-      password,
-    });
-    tokenManager.setSession(accessToken, refreshToken, rememberMe);
+    // Login itself only returns the bare profile (no roles/permissions) — fetch
+    // the full authenticated profile right after so hasRole/hasPermission work.
+    const { access_token, refresh_token } = await authService.login({ email, password });
+    tokenManager.setSession(access_token, refresh_token, rememberMe);
+
+    const fullUser = await authService.getCurrentUser();
     Cookies.set(SESSION_COOKIE, "1", {
       sameSite: "lax",
       expires: rememberMe ? 30 : undefined,
     });
-    setUser(loggedInUser);
+    setUser(fullUser);
     setStatus("authenticated");
-    return loggedInUser;
+    return fullUser;
   }, []);
 
   const logout = React.useCallback(async () => {
@@ -105,13 +108,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [handleSessionEnd, router]);
 
-  const hasRole = React.useCallback((...roles: RoleName[]) => !!user && roles.includes(user.role), [
+  const hasRole = React.useCallback((...roles: string[]) => !!user && roles.some((role) => user.roles.includes(role)), [
     user,
   ]);
 
   const hasPermission = React.useCallback(
-    (...permissions: Permission[]) =>
-      !!user && permissions.some((permission) => user.permissions.includes(permission)),
+    (...permissions: string[]) =>
+      !!user &&
+      (user.roles.includes(SUPER_ADMIN_ROLE) ||
+        permissions.some((permission) => user.permissions.includes(permission))),
     [user],
   );
 

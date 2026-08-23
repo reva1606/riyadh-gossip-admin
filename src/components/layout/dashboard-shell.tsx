@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { SidebarProvider, useSidebar } from "@/store/sidebar-context";
 import { Header } from "@/components/layout/header";
 import { MobileSidebar } from "@/components/layout/mobile-sidebar";
+import { MustChangePasswordBanner } from "@/components/layout/must-change-password-banner";
 import { ProtectedGuard } from "@/components/layout/protected-guard";
 import { Sidebar } from "@/components/layout/sidebar";
 
@@ -23,6 +24,7 @@ function ShellBody({ children }: { children: React.ReactNode }) {
         )}
       >
         <Header />
+        <MustChangePasswordBanner />
         <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>

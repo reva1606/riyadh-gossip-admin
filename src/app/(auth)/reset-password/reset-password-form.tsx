@@ -37,7 +37,7 @@ export function ResetPasswordForm() {
 
   function onSubmit(values: ResetPasswordFormValues) {
     resetPassword.mutate(
-      { email, otp: values.otp, newPassword: values.password },
+      { email, otp: values.otp, password: values.password },
       {
         onSuccess: () => {
           toast.success("Password reset. Please sign in.");
