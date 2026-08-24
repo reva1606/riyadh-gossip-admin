@@ -16,6 +16,10 @@ export const usersService = {
   detail: (id: number) =>
     apiClient.get<ApiResponse<User>>(API_ENDPOINTS.users.detail(id)).then((res) => res.data),
 
+  /** PATCH /users/me — self-service profile edits (email is rejected server-side). */
+  updateMe: (payload: UpdateUserPayload) =>
+    apiClient.patch<ApiResponse<User>>(API_ENDPOINTS.users.me, payload).then((res) => res.data),
+
   update: (id: number, payload: UpdateUserPayload) =>
     apiClient
       .patch<ApiResponse<User>>(API_ENDPOINTS.users.detail(id), payload)

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { ChangePasswordForm } from "./change-password-form";
+import { ProfilePhotoUpload } from "./profile-photo-upload";
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -22,7 +23,8 @@ export default function SettingsPage() {
             <CardTitle>Profile</CardTitle>
             <CardDescription>Your account details.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3 text-sm">
+          <CardContent className="flex flex-col gap-5 text-sm">
+            <ProfilePhotoUpload />
             <div className="flex justify-between gap-4">
               <span className="text-muted-foreground">Name</span>
               <span className="font-medium">

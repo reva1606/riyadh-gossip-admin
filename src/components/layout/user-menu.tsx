@@ -4,8 +4,9 @@ import Link from "next/link";
 import { LogOut, Settings, User as UserIcon } from "lucide-react";
 
 import { ROUTES } from "@/config/routes";
+import { env } from "@/config/env";
 import { useAuth } from "@/store/auth-context";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,6 +30,7 @@ export function UserMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-10 gap-2 px-1.5">
           <Avatar>
+            {user?.avatar_url && <AvatarImage src={`${env.apiUrl}${user.avatar_url}`} alt="" />}
             <AvatarFallback>{getInitials(user?.first_name, user?.last_name)}</AvatarFallback>
           </Avatar>
           <div className="hidden text-left leading-tight md:block">

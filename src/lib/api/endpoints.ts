@@ -12,11 +12,15 @@ export const API_ENDPOINTS = {
   },
   users: {
     list: "/users",
+    me: "/users/me",
     detail: (id: number | string) => `/users/${id}`,
     activate: (id: number | string) => `/users/${id}/activate`,
     deactivate: (id: number | string) => `/users/${id}/deactivate`,
     roles: (id: number | string) => `/users/${id}/roles`,
     removeRole: (id: number | string, roleId: number | string) => `/users/${id}/roles/${roleId}`,
+  },
+  uploads: {
+    single: "/uploads/single",
   },
   roles: {
     list: "/roles",

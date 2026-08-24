@@ -8,6 +8,8 @@ export interface User {
   email: string;
   status: UserStatus;
   email_verified: boolean;
+  /** Relative URL under the API's /uploads/ static prefix, or null if no photo has been set. */
+  avatar_url: string | null;
   /** True for accounts still on a system-generated temporary password (e.g. new staff). */
   must_change_password: boolean;
   created_at: string;
@@ -31,6 +33,8 @@ export interface UpdateUserPayload {
   email?: string;
   status?: UserStatus;
   password?: string;
+  /** Set from a prior uploadsService.uploadSingle() result's `url`; "" removes the current photo. */
+  avatar_url?: string;
 }
 
 export interface UsersListParams {

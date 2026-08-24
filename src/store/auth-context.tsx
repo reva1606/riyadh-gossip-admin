@@ -23,6 +23,8 @@ interface AuthContextValue {
   isLoading: boolean;
   login: (email: string, password: string, rememberMe: boolean) => Promise<AuthenticatedUser>;
   logout: () => Promise<void>;
+  /** Re-fetches the current user's profile — e.g. after a self-service edit like an avatar upload. */
+  refreshUser: () => Promise<void>;
   hasRole: (...roles: string[]) => boolean;
   hasPermission: (...permissions: string[]) => boolean;
 }
@@ -108,6 +110,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [handleSessionEnd, router]);
 
+  const refreshUser = React.useCallback(async () => {
+    const fullUser = await authService.getCurrentUser();
+    setUser(fullUser);
+  }, []);
+
   const hasRole = React.useCallback((...roles: string[]) => !!user && roles.some((role) => user.roles.includes(role)), [
     user,
   ]);
@@ -128,10 +135,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading: status === "loading",
       login,
       logout,
+      refreshUser,
       hasRole,
       hasPermission,
     }),
-    [status, user, login, logout, hasRole, hasPermission],
+    [status, user, login, logout, refreshUser, hasRole, hasPermission],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
