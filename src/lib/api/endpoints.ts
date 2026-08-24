@@ -38,6 +38,18 @@ export const API_ENDPOINTS = {
   },
 } as const;
 
+/** Event management — served by the "core" sub-app (its own port), see coreApiClient. */
+export const CORE_ENDPOINTS = {
+  categories: {
+    list: "/categories",
+    detail: (id: number | string) => `/categories/${id}`,
+  },
+  events: {
+    list: "/events",
+    detail: (id: number | string) => `/events/${id}`,
+  },
+} as const;
+
 /** Requests that must never carry a stale Authorization header or trigger a refresh loop. */
 export const PUBLIC_ENDPOINTS: string[] = [
   API_ENDPOINTS.auth.login,

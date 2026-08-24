@@ -16,4 +16,7 @@ export const QUERY_KEYS = {
   roles: ["roles"] as const,
   rolePermissions: (roleId: number) => ["roles", roleId, "permissions"] as const,
   permissions: ["permissions"] as const,
+  categories: ["categories"] as const,
+  events: ["events"] as const,
+  eventDetail: (eventId: number) => ["events", eventId] as const,
 };

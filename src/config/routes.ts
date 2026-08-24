@@ -8,6 +8,7 @@ export const ROUTES = {
   users: "/users",
   roles: "/roles",
   permissions: "/permissions",
+  categories: "/categories",
   events: "/events",
   bookings: "/bookings",
   tickets: "/tickets",

@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Settings,
   ShieldCheck,
+  Tags,
   Ticket,
   Users,
 } from "lucide-react";
@@ -25,7 +26,8 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Users", href: ROUTES.users, icon: Users, permission: "user.view" },
   { label: "Roles & Permissions", href: ROUTES.roles, icon: ShieldCheck, permission: "role.view" },
   { label: "Permissions", href: ROUTES.permissions, icon: KeyRound, permission: "permission.view" },
-  { label: "Events", href: ROUTES.events, icon: CalendarDays },
+  { label: "Categories", href: ROUTES.categories, icon: Tags, permission: "category.view" },
+  { label: "Events", href: ROUTES.events, icon: CalendarDays, permission: "event.view" },
   { label: "Bookings", href: ROUTES.bookings, icon: ClipboardList },
   { label: "Tickets", href: ROUTES.tickets, icon: Ticket },
   { label: "Settings", href: ROUTES.settings, icon: Settings },
