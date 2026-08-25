@@ -10,6 +10,7 @@ export const ROUTES = {
   permissions: "/permissions",
   categories: "/categories",
   events: "/events",
+  promoCodes: "/promo-codes",
   bookings: "/bookings",
   settings: "/settings",
 } as const;

@@ -4,6 +4,7 @@ import {
   ClipboardList,
   KeyRound,
   LayoutDashboard,
+  Percent,
   Settings,
   ShieldCheck,
   Tags,
@@ -28,5 +29,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Categories", href: ROUTES.categories, icon: Tags, permission: "category.view" },
   { label: "Events", href: ROUTES.events, icon: CalendarDays, permission: "event.view" },
   { label: "Bookings", href: ROUTES.bookings, icon: ClipboardList, permission: "booking.view" },
+  { label: "Promo Codes", href: ROUTES.promoCodes, icon: Percent, permission: "promocode.view" },
   { label: "Settings", href: ROUTES.settings, icon: Settings },
 ];

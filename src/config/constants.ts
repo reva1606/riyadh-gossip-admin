@@ -21,4 +21,6 @@ export const QUERY_KEYS = {
   eventDetail: (eventId: number) => ["events", eventId] as const,
   bookings: ["bookings"] as const,
   bookingDetail: (bookingId: number) => ["bookings", bookingId] as const,
+  promoCodes: ["promo-codes"] as const,
+  promoCodeDetail: (promoCodeId: number) => ["promo-codes", promoCodeId] as const,
 };
