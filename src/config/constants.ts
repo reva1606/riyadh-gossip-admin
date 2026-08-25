@@ -19,4 +19,6 @@ export const QUERY_KEYS = {
   categories: ["categories"] as const,
   events: ["events"] as const,
   eventDetail: (eventId: number) => ["events", eventId] as const,
+  promoCodes: ["promo-codes"] as const,
+  promoCodeDetail: (promoCodeId: number) => ["promo-codes", promoCodeId] as const,
 };
