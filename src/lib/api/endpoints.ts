@@ -48,6 +48,10 @@ export const CORE_ENDPOINTS = {
     list: "/events",
     detail: (id: number | string) => `/events/${id}`,
   },
+  bookings: {
+    list: "/bookings",
+    detail: (id: number | string) => `/bookings/${id}`,
+  },
 } as const;
 
 /** Requests that must never carry a stale Authorization header or trigger a refresh loop. */

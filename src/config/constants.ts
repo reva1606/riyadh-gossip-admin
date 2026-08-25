@@ -1,4 +1,4 @@
-export const APP_NAME = "Riyadh Gossip" as const;
+export const APP_NAME = "MBFshow" as const;
 
 /** localStorage/sessionStorage keys used by the token manager. */
 export const STORAGE_KEYS = {
@@ -19,4 +19,6 @@ export const QUERY_KEYS = {
   categories: ["categories"] as const,
   events: ["events"] as const,
   eventDetail: (eventId: number) => ["events", eventId] as const,
+  bookings: ["bookings"] as const,
+  bookingDetail: (bookingId: number) => ["bookings", bookingId] as const,
 };

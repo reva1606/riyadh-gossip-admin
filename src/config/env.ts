@@ -7,6 +7,6 @@ export const env = {
   apiUrl: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000",
   /** The "core" sub-app (event management: categories/events) — separate service, separate port. */
   coreApiUrl: process.env.NEXT_PUBLIC_CORE_API_URL ?? "http://localhost:4001",
-  appName: process.env.NEXT_PUBLIC_APP_NAME ?? "Riyadh Gossip Admin",
+  appName: process.env.NEXT_PUBLIC_APP_NAME ?? "MBFshow Admin",
   isProduction: process.env.NODE_ENV === "production",
 } as const;

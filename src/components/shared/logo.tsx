@@ -13,7 +13,7 @@ export function Logo({ collapsed = false, className }: LogoProps) {
       </div>
       {!collapsed && (
         <span className="text-base font-semibold tracking-tight text-sidebar-foreground">
-          Riyadh Gossip
+          MBFshow
         </span>
       )}
     </div>

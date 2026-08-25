@@ -7,7 +7,6 @@ import {
   Settings,
   ShieldCheck,
   Tags,
-  Ticket,
   Users,
 } from "lucide-react";
 
@@ -28,7 +27,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Permissions", href: ROUTES.permissions, icon: KeyRound, permission: "permission.view" },
   { label: "Categories", href: ROUTES.categories, icon: Tags, permission: "category.view" },
   { label: "Events", href: ROUTES.events, icon: CalendarDays, permission: "event.view" },
-  { label: "Bookings", href: ROUTES.bookings, icon: ClipboardList },
-  { label: "Tickets", href: ROUTES.tickets, icon: Ticket },
+  { label: "Bookings", href: ROUTES.bookings, icon: ClipboardList, permission: "booking.view" },
   { label: "Settings", href: ROUTES.settings, icon: Settings },
 ];

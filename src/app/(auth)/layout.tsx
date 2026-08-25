@@ -24,13 +24,13 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
               Run the show from one dashboard.
             </h1>
             <p className="mt-3 text-sm text-sidebar-muted-foreground">
-              Staff, events, tickets and bookings — everything the Riyadh Gossip team needs to
+              Staff, events, tickets and bookings — everything the MBFshow team needs to
               keep Riyadh&apos;s nightlife running, in one place.
             </p>
           </div>
 
           <p className="relative z-10 text-xs text-sidebar-muted-foreground">
-            © {new Date().getFullYear()} Riyadh Gossip. All rights reserved.
+            © {new Date().getFullYear()} MBFshow. All rights reserved.
           </p>
         </div>
 

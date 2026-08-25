@@ -152,7 +152,7 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
                   <FormItem>
                     <FormLabel>Title</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Riyadh Music Night" {...field} />
+                      <Input placeholder="e.g. MBFshow Music Night" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -49,7 +49,7 @@ export default function DashboardPage() {
     <>
       <PageHeader
         title={`Welcome back${user ? `, ${user.first_name}` : ""}`}
-        description="Here's what's happening across Riyadh Gossip today."
+        description="Here's what's happening across MBFshow today."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

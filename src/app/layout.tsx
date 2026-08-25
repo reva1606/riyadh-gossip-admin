@@ -17,10 +17,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Riyadh Gossip Admin",
-    template: "%s · Riyadh Gossip Admin",
+    default: "MBFshow Admin",
+    template: "%s · MBFshow Admin",
   },
-  description: "Admin panel for the Riyadh Gossip entertainment platform.",
+  description: "Admin panel for the MBFshow entertainment platform.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
