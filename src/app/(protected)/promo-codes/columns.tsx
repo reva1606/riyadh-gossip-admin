@@ -46,6 +46,19 @@ export const promoCodeColumns = columnHelper.columns([
     header: ({ column }) => <DataTableColumnHeader column={column} title="Valid until" />,
     cell: ({ getValue }) => <span className="text-muted-foreground">{formatDate(getValue())}</span>,
   }),
+  columnHelper.display({
+    id: "usage",
+    header: "Usage",
+    cell: ({ row }) =>
+      row.original.max_uses == null ? (
+        <span className="text-muted-foreground">{row.original.used_count} used · unlimited</span>
+      ) : (
+        <Badge variant={row.original.used_count >= row.original.max_uses ? "secondary" : "outline"}>
+          {row.original.used_count} / {row.original.max_uses}
+        </Badge>
+      ),
+    enableSorting: false,
+  }),
   columnHelper.accessor("is_active", {
     id: "is_active",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,

@@ -37,6 +37,7 @@ const EMPTY_DEFAULTS: PromoCodeFormValues = {
   valid_until: "",
   type: "PERCENTAGE",
   value: 0,
+  max_uses: "",
   is_active: true,
 };
 
@@ -50,6 +51,7 @@ function toDefaultValues(promoCode: PromoCode | null | undefined): PromoCodeForm
     valid_until: promoCode.valid_until ?? "",
     type: promoCode.type,
     value: promoCode.value,
+    max_uses: promoCode.max_uses ?? "",
     is_active: promoCode.is_active,
   };
 }
@@ -116,6 +118,7 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
       valid_until: values.valid_until || undefined,
       type: values.type,
       value: values.value,
+      max_uses: values.max_uses === "" ? null : values.max_uses,
       user_ids: selectedUsers.map((user) => user.id),
       event_ids: selectedEvents.map((event) => event.id),
       is_active: values.is_active,
@@ -226,6 +229,24 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="max_uses"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Max total uses</FormLabel>
+                    <FormControl>
+                      <Input type="number" step={1} min={1} placeholder="Unlimited" {...field} />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      How many times this code can be redeemed in total, across all users combined. Leave blank for
+                      unlimited.
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField

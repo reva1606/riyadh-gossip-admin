@@ -24,6 +24,10 @@ export interface PromoCode {
   type: PromoCodeType;
   value: number;
   is_active: boolean;
+  /** Global redemption cap across all users combined. Null = unlimited. */
+  max_uses: number | null;
+  /** How many bookings have used this code so far (PAID, or PENDING_PAYMENT not yet expired). */
+  used_count: number;
   /** Empty means applicable to all users. */
   users: PromoCodeUserRef[];
   /** Empty means applicable to all events. */
@@ -43,6 +47,8 @@ export interface CreatePromoCodePayload {
   type: PromoCodeType;
   /** Must be > 0. For PERCENTAGE, must also be <= 100. */
   value: number;
+  /** Global redemption cap across all users combined. Omit or send null for unlimited. */
+  max_uses?: number | null;
   /** Omit or leave empty to make it applicable to all users. */
   user_ids?: number[];
   /** Omit or leave empty to make it applicable to all events. */

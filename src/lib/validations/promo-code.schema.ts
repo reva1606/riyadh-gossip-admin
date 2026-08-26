@@ -12,6 +12,11 @@ export const promoCodeFormSchema = z
     value: z.coerce
       .number({ invalid_type_error: "Value is required" })
       .positive("Value must be greater than 0"),
+    // "" means unlimited — same "" -> undefined convention as valid_from/valid_until.
+    max_uses: z.union([
+      z.literal(""),
+      z.coerce.number().int("Must be a whole number").positive("Must be greater than 0"),
+    ]),
     is_active: z.boolean(),
   })
   .refine((values) => values.type !== "PERCENTAGE" || values.value <= 100, {
