@@ -30,28 +30,11 @@ import {
   useDeletePromoCodeMutation,
   usePromoCodesQuery,
 } from "@/hooks/use-promo-codes";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import type { PromoCode, PromoCodesListParams } from "@/types/promo-code.types";
 
-import { promoCodeColumns } from "./columns";
+import { getPromoCodeColumns } from "./columns";
 import { PromoCodeFormSheet } from "./promo-code-form-sheet";
-
-const TYPE_FILTER: DataTableFilterConfig = {
-  id: "type",
-  label: "Type",
-  options: [
-    { label: "Percentage", value: "PERCENTAGE" },
-    { label: "Fixed", value: "FIXED" },
-  ],
-};
-
-const STATUS_FILTER: DataTableFilterConfig = {
-  id: "is_active",
-  label: "Status",
-  options: [
-    { label: "Active", value: "true" },
-    { label: "Inactive", value: "false" },
-  ],
-};
 
 const SORTABLE_COLUMN_IDS = new Set(["code", "value", "valid_from", "valid_until", "is_active", "created_at"]);
 
@@ -68,6 +51,26 @@ function PromoCodesPageContent() {
   const canCreate = hasPermission("promocode.create");
   const canUpdate = hasPermission("promocode.update");
   const canDelete = hasPermission("promocode.delete");
+  const { t, locale } = useTranslation();
+  const promoCodeColumns = React.useMemo(() => getPromoCodeColumns(locale), [locale]);
+
+  const typeFilter: DataTableFilterConfig = {
+    id: "type",
+    label: t("promoCodes.filters.typeLabel"),
+    options: [
+      { label: t("promoCodes.filters.percentage"), value: "PERCENTAGE" },
+      { label: t("promoCodes.filters.fixed"), value: "FIXED" },
+    ],
+  };
+
+  const statusFilter: DataTableFilterConfig = {
+    id: "is_active",
+    label: t("promoCodes.filters.statusLabel"),
+    options: [
+      { label: t("common.active"), value: "true" },
+      { label: t("common.inactive"), value: "false" },
+    ],
+  };
 
   const [pagination, setPagination] = React.useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -138,8 +141,8 @@ function PromoCodesPageContent() {
   return (
     <>
       <PageHeader
-        title="Promo Codes"
-        description="Create and manage discount codes, their validity windows and restrictions."
+        title={t("promoCodes.title")}
+        description={t("promoCodes.description")}
         actions={
           canCreate ? (
             <Button
@@ -149,7 +152,7 @@ function PromoCodesPageContent() {
               className="gap-1.5"
             >
               <Plus className="size-4" />
-              Create promo code
+              {t("promoCodes.createButton")}
             </Button>
           ) : undefined
         }
@@ -170,16 +173,16 @@ function PromoCodesPageContent() {
         onSearchChange={handleSearchChange}
         filterValues={{ type, is_active: isActive }}
         onFilterChange={handleFilterChange}
-        searchPlaceholder="Search by name or code…"
-        filters={[TYPE_FILTER, STATUS_FILTER]}
+        searchPlaceholder={t("promoCodes.searchPlaceholder")}
+        filters={[typeFilter, statusFilter]}
         getRowId={(row) => String(row.id)}
-        totalLabel="Promo codes"
+        totalLabel={t("promoCodes.totalLabel")}
         renderRowActions={(promoCode) => (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="size-8">
                 <MoreHorizontal className="size-4" />
-                <span className="sr-only">Row actions</span>
+                <span className="sr-only">{t("common.rowActions")}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -189,16 +192,16 @@ function PromoCodesPageContent() {
                   setFormState((prev) => ({ open: true, promoCode, formKey: prev.formKey + 1 }))
                 }
               >
-                <Pencil /> Edit
+                <Pencil /> {t("common.edit")}
               </DropdownMenuItem>
               <DropdownMenuItem disabled={!canUpdate} onClick={() => void handleToggleStatus(promoCode)}>
                 {promoCode.is_active ? (
                   <>
-                    <PowerOff /> Deactivate
+                    <PowerOff /> {t("promoCodes.actions.deactivate")}
                   </>
                 ) : (
                   <>
-                    <Power /> Activate
+                    <Power /> {t("promoCodes.actions.activate")}
                   </>
                 )}
               </DropdownMenuItem>
@@ -207,7 +210,7 @@ function PromoCodesPageContent() {
                 disabled={!canDelete}
                 onClick={() => setDeletingPromoCode(promoCode)}
               >
-                <Trash2 /> Delete
+                <Trash2 /> {t("common.delete")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -224,23 +227,23 @@ function PromoCodesPageContent() {
       <Dialog open={!!deletingPromoCode} onOpenChange={(open) => !open && setDeletingPromoCode(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete promo code</DialogTitle>
+            <DialogTitle>{t("promoCodes.delete.title")}</DialogTitle>
             <DialogDescription>
-              This permanently deletes{" "}
-              <span className="font-medium text-foreground">{deletingPromoCode?.code}</span>. This action cannot
-              be undone.
+              {t("promoCodes.delete.descriptionPrefix")}{" "}
+              <span className="font-medium text-foreground">{deletingPromoCode?.code}</span>{" "}
+              {t("promoCodes.delete.descriptionSuffix")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeletingPromoCode(null)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               variant="destructive"
               disabled={deleteMutation.isPending}
               onClick={() => void handleConfirmDelete()}
             >
-              {deleteMutation.isPending ? "Deleting…" : "Delete"}
+              {deleteMutation.isPending ? t("common.deleting") : t("common.delete")}
             </Button>
           </DialogFooter>
         </DialogContent>

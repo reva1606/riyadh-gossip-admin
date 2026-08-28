@@ -13,12 +13,29 @@ import {
   useUserRolesQuery,
 } from "@/hooks/use-users";
 import { useRolesQuery } from "@/hooks/use-roles";
-import { editUserSchema, type EditUserFormValues } from "@/lib/validations/user.schema";
+import {
+  editUserSchema,
+  type EditUserFormValues,
+} from "@/lib/validations/user.schema";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -37,17 +54,27 @@ interface UserEditSheetProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function UserEditSheet({ user, open, onOpenChange }: UserEditSheetProps) {
+export function UserEditSheet({
+  user,
+  open,
+  onOpenChange,
+}: UserEditSheetProps) {
   const { hasPermission, user: currentUser } = useAuth();
   const canUpdate = hasPermission("user.update");
   const isSelf = user?.id === currentUser?.id;
   const canAssignRole = hasPermission("user.role.assign") && !isSelf;
+  const { t } = useTranslation();
 
   const updateMutation = useUpdateUserMutation();
 
   const form = useForm<EditUserFormValues>({
     resolver: zodResolver(editUserSchema),
-    defaultValues: { first_name: "", last_name: "", email: "", status: "ACTIVE" },
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      email: "",
+      status: "ACTIVE",
+    },
   });
 
   React.useEffect(() => {
@@ -63,18 +90,31 @@ export function UserEditSheet({ user, open, onOpenChange }: UserEditSheetProps) 
 
   function onSubmit(values: EditUserFormValues) {
     if (!user) return;
-    updateMutation.mutate({ id: user.id, payload: values }, { onSuccess: () => onOpenChange(false) });
+    updateMutation.mutate(
+      { id: user.id, payload: values },
+      { onSuccess: () => onOpenChange(false) },
+    );
   }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        title={user ? `Edit ${user.first_name} ${user.last_name}` : "Edit user"}
+        title={
+          user
+            ? t("users.editSheet.editUserTitle", {
+                name: `${user.first_name} ${user.last_name}`,
+              })
+            : t("users.editSheet.fallbackTitle")
+        }
         className="w-full gap-0 sm:max-w-md"
       >
         <SheetHeader className="border-b border-border">
-          <h2 className="text-lg font-semibold">{user ? `${user.first_name} ${user.last_name}` : "Edit user"}</h2>
+          <h2 className="text-lg font-semibold">
+            {user
+              ? `${user.first_name} ${user.last_name}`
+              : t("users.editSheet.fallbackTitle")}
+          </h2>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
         </SheetHeader>
 
@@ -82,22 +122,27 @@ export function UserEditSheet({ user, open, onOpenChange }: UserEditSheetProps) 
           <Tabs defaultValue="profile" className="pt-4">
             <TabsList className="w-full">
               <TabsTrigger value="profile" className="flex-1">
-                Profile
+                {t("users.editSheet.profileTab")}
               </TabsTrigger>
               <TabsTrigger value="roles" className="flex-1">
-                Roles
+                {t("users.editSheet.rolesTab")}
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile">
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="flex flex-col gap-4"
+                >
                   <FormField
                     control={form.control}
                     name="first_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First name</FormLabel>
+                        <FormLabel>
+                          {t("users.editSheet.firstNameLabel")}
+                        </FormLabel>
                         <FormControl>
                           <Input disabled={!canUpdate} {...field} />
                         </FormControl>
@@ -110,7 +155,9 @@ export function UserEditSheet({ user, open, onOpenChange }: UserEditSheetProps) 
                     name="last_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last name</FormLabel>
+                        <FormLabel>
+                          {t("users.editSheet.lastNameLabel")}
+                        </FormLabel>
                         <FormControl>
                           <Input disabled={!canUpdate} {...field} />
                         </FormControl>
@@ -123,9 +170,13 @@ export function UserEditSheet({ user, open, onOpenChange }: UserEditSheetProps) 
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t("users.editSheet.emailLabel")}</FormLabel>
                         <FormControl>
-                          <Input type="email" disabled={!canUpdate} {...field} />
+                          <Input
+                            type="email"
+                            disabled={!canUpdate}
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -136,16 +187,26 @@ export function UserEditSheet({ user, open, onOpenChange }: UserEditSheetProps) 
                     name="status"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <Select value={field.value} onValueChange={field.onChange} disabled={!canUpdate}>
+                        <FormLabel>
+                          {t("users.editSheet.statusLabel")}
+                        </FormLabel>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          disabled={!canUpdate}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="ACTIVE">Active</SelectItem>
-                            <SelectItem value="INACTIVE">Inactive</SelectItem>
+                            <SelectItem value="ACTIVE">
+                              {t("common.active")}
+                            </SelectItem>
+                            <SelectItem value="INACTIVE">
+                              {t("common.inactive")}
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -154,8 +215,14 @@ export function UserEditSheet({ user, open, onOpenChange }: UserEditSheetProps) 
                   />
 
                   {canUpdate && (
-                    <Button type="submit" disabled={updateMutation.isPending} className="mt-2">
-                      {updateMutation.isPending ? "Saving…" : "Save changes"}
+                    <Button
+                      type="submit"
+                      disabled={updateMutation.isPending}
+                      className="mt-2"
+                    >
+                      {updateMutation.isPending
+                        ? t("common.saving")
+                        : t("users.editSheet.saveChanges")}
                     </Button>
                   )}
                 </form>
@@ -163,7 +230,11 @@ export function UserEditSheet({ user, open, onOpenChange }: UserEditSheetProps) 
             </TabsContent>
 
             <TabsContent value="roles">
-              <UserRolesPanel userId={user?.id ?? null} canAssignRole={canAssignRole} isSelf={isSelf} />
+              <UserRolesPanel
+                userId={user?.id ?? null}
+                canAssignRole={canAssignRole}
+                isSelf={isSelf}
+              />
             </TabsContent>
           </Tabs>
         </div>
@@ -181,6 +252,7 @@ function UserRolesPanel({
   canAssignRole: boolean;
   isSelf: boolean;
 }) {
+  const { t } = useTranslation();
   const rolesQuery = useUserRolesQuery(userId);
   const allRolesQuery = useRolesQuery();
   const assignMutation = useAssignUserRoleMutation();
@@ -189,7 +261,8 @@ function UserRolesPanel({
 
   const assignedIds = new Set((rolesQuery.data ?? []).map((role) => role.id));
   const availableRoles = (allRolesQuery.data ?? []).filter(
-    (role) => !assignedIds.has(role.id) && !NON_ASSIGNABLE_ROLE_NAMES.has(role.name),
+    (role) =>
+      !assignedIds.has(role.id) && !NON_ASSIGNABLE_ROLE_NAMES.has(role.name),
   );
 
   function handleAssign() {
@@ -203,20 +276,31 @@ function UserRolesPanel({
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <p className="mb-2 text-sm font-medium">Current roles</p>
+        <p className="mb-2 text-sm font-medium">
+          {t("users.editSheet.currentRoles")}
+        </p>
         {rolesQuery.isLoading ? (
           <Skeleton className="h-8 w-full" />
         ) : rolesQuery.data?.length ? (
           <div className="flex flex-wrap gap-2">
             {rolesQuery.data.map((role) => (
-              <Badge key={role.id} variant="secondary" className="gap-1.5 py-1 pr-1">
+              <Badge
+                key={role.id}
+                variant="secondary"
+                className="gap-1.5 py-1 pe-1"
+              >
                 {role.name}
                 {canAssignRole && !NON_ASSIGNABLE_ROLE_NAMES.has(role.name) && (
                   <button
                     type="button"
-                    onClick={() => userId && removeMutation.mutate({ id: userId, roleId: role.id })}
+                    onClick={() =>
+                      userId &&
+                      removeMutation.mutate({ id: userId, roleId: role.id })
+                    }
                     className="rounded-full p-0.5 hover:bg-muted-foreground/20"
-                    aria-label={`Remove ${role.name}`}
+                    aria-label={t("users.editSheet.removeRoleLabel", {
+                      role: role.name,
+                    })}
                   >
                     <X className="size-3" />
                   </button>
@@ -225,19 +309,29 @@ function UserRolesPanel({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">No roles assigned.</p>
+          <p className="text-sm text-muted-foreground">
+            {t("users.editSheet.noRolesAssigned")}
+          </p>
         )}
       </div>
 
-      {isSelf && <p className="text-sm text-muted-foreground">You cannot change your own roles.</p>}
+      {isSelf && (
+        <p className="text-sm text-muted-foreground">
+          {t("users.editSheet.cannotChangeOwnRoles")}
+        </p>
+      )}
 
       {canAssignRole && (
         <div>
-          <p className="mb-2 text-sm font-medium">Assign a role</p>
+          <p className="mb-2 text-sm font-medium">
+            {t("users.editSheet.assignRole")}
+          </p>
           <div className="flex gap-2">
             <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
               <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Select a role" />
+                <SelectValue
+                  placeholder={t("users.editSheet.selectRolePlaceholder")}
+                />
               </SelectTrigger>
               <SelectContent>
                 {availableRoles.map((role) => (
@@ -247,8 +341,12 @@ function UserRolesPanel({
                 ))}
               </SelectContent>
             </Select>
-            <Button type="button" onClick={handleAssign} disabled={!selectedRoleId || assignMutation.isPending}>
-              Add
+            <Button
+              type="button"
+              onClick={handleAssign}
+              disabled={!selectedRoleId || assignMutation.isPending}
+            >
+              {t("users.editSheet.addButton")}
             </Button>
           </div>
         </div>

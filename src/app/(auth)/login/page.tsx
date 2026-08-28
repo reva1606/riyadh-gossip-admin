@@ -9,6 +9,7 @@ import { ROUTES } from "@/config/routes";
 import { useLogin } from "@/hooks/use-login";
 import { toApiError } from "@/lib/api/api-error";
 import { loginSchema, type LoginFormValues } from "@/lib/validations/auth.schema";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -25,6 +26,7 @@ import { PasswordInput } from "@/components/forms/password-input";
 
 export default function LoginPage() {
   const login = useLogin();
+  const { t } = useTranslation();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -35,7 +37,7 @@ export default function LoginPage() {
     login.mutate(values, {
       onSuccess: (user) => {
         if (user.must_change_password) {
-          toast("You're signed in with a temporary password — please change it in Settings.", {
+          toast(t("auth.tempPasswordToast"), {
             icon: "⚠️",
             duration: 6000,
           });
@@ -48,8 +50,8 @@ export default function LoginPage() {
   return (
     <Card className="border-none bg-transparent shadow-none sm:border-border sm:bg-card sm:shadow-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Welcome back</CardTitle>
-        <CardDescription>Sign in to manage staff, events and bookings.</CardDescription>
+        <CardTitle className="text-2xl">{t("auth.welcomeBack")}</CardTitle>
+        <CardDescription>{t("auth.signInSubtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -59,7 +61,7 @@ export default function LoginPage() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("auth.email")}</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -79,12 +81,12 @@ export default function LoginPage() {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between">
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>{t("auth.password")}</FormLabel>
                     <Link
                       href={ROUTES.forgotPassword}
                       className="text-xs font-medium text-primary hover:underline"
                     >
-                      Forgot password?
+                      {t("auth.forgotPasswordLink")}
                     </Link>
                   </div>
                   <FormControl>
@@ -104,14 +106,14 @@ export default function LoginPage() {
                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
                   <FormLabel className="text-sm font-normal text-muted-foreground">
-                    Remember me on this device
+                    {t("auth.rememberMe")}
                   </FormLabel>
                 </FormItem>
               )}
             />
 
             <Button type="submit" size="lg" disabled={login.isPending} className="mt-1">
-              {login.isPending ? "Signing in…" : "Sign in"}
+              {login.isPending ? t("auth.signingIn") : t("auth.signIn")}
             </Button>
           </form>
         </Form>

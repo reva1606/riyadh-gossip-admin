@@ -6,6 +6,7 @@ import { LogOut, Settings, User as UserIcon } from "lucide-react";
 import { ROUTES } from "@/config/routes";
 import { env } from "@/config/env";
 import { useAuth } from "@/store/auth-context";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +24,7 @@ function getInitials(firstName?: string, lastName?: string) {
 
 export function UserMenu() {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
   const primaryRole = user?.roles[0];
 
   return (
@@ -33,7 +35,7 @@ export function UserMenu() {
             {user?.avatar_url && <AvatarImage src={`${env.apiUrl}${user.avatar_url}`} alt="" />}
             <AvatarFallback>{getInitials(user?.first_name, user?.last_name)}</AvatarFallback>
           </Avatar>
-          <div className="hidden text-left leading-tight md:block">
+          <div className="hidden text-start leading-tight md:block">
             <p className="text-sm font-medium">
               {user ? `${user.first_name} ${user.last_name}` : "—"}
             </p>
@@ -51,17 +53,17 @@ export function UserMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href={ROUTES.settings}>
-            <UserIcon /> My Profile
+            <UserIcon /> {t("common.myProfile")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href={ROUTES.settings}>
-            <Settings /> Settings
+            <Settings /> {t("common.settings")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={() => void logout()}>
-          <LogOut /> Logout
+          <LogOut /> {t("common.logout")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

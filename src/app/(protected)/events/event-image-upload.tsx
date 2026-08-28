@@ -7,6 +7,7 @@ import { ImagePlus, Loader2, X } from "lucide-react";
 import { env } from "@/config/env";
 import { uploadsService } from "@/services/uploads.service";
 import { toApiError } from "@/lib/api/api-error";
+import { useTranslation } from "@/lib/i18n/language-provider";
 
 // Mirrors the backend's defaults (upload.config.ts) — client-side UX only,
 // the server enforces its own copy of these limits regardless.
@@ -20,6 +21,7 @@ interface EventImageUploadProps {
 
 /** Multi-image grid for an event — uploads through the main API's generic /uploads/single, stores the URLs. */
 export function EventImageUpload({ value, onChange }: EventImageUploadProps) {
+  const { t } = useTranslation();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = React.useState(false);
 
@@ -30,11 +32,11 @@ export function EventImageUpload({ value, onChange }: EventImageUploadProps) {
 
     for (const file of files) {
       if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-        toast.error(`${file.name}: please choose a JPEG, PNG, WEBP or GIF image.`);
+        toast.error(t("events.imageUpload.invalidType", { fileName: file.name }));
         return;
       }
       if (file.size > MAX_FILE_SIZE_BYTES) {
-        toast.error(`${file.name}: image must be 5MB or smaller.`);
+        toast.error(t("events.imageUpload.tooLarge", { fileName: file.name }));
         return;
       }
     }
@@ -63,8 +65,8 @@ export function EventImageUpload({ value, onChange }: EventImageUploadProps) {
           <button
             type="button"
             onClick={() => handleRemove(url)}
-            className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
-            aria-label="Remove image"
+            className="absolute inset-e-1 top-1 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+            aria-label={t("events.imageUpload.removeAria")}
           >
             <X className="size-3.5" />
           </button>
@@ -78,7 +80,7 @@ export function EventImageUpload({ value, onChange }: EventImageUploadProps) {
         className="flex size-24 flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border text-muted-foreground transition-colors hover:border-ring hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
       >
         {isUploading ? <Loader2 className="size-5 animate-spin" /> : <ImagePlus className="size-5" />}
-        <span className="text-xs">Add image</span>
+        <span className="text-xs">{t("events.imageUpload.addImage")}</span>
       </button>
 
       <input

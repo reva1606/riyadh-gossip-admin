@@ -20,7 +20,7 @@ function ShellBody({ children }: { children: React.ReactNode }) {
       <div
         className={cn(
           "flex min-h-screen flex-col transition-[margin] duration-200",
-          isCollapsed ? "lg:ml-[76px]" : "lg:ml-64",
+          isCollapsed ? "lg:ms-[76px]" : "lg:ms-64",
         )}
       >
         <Header />

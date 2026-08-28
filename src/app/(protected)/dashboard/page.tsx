@@ -7,6 +7,7 @@ import { useAuth } from "@/store/auth-context";
 import { useUsersQuery } from "@/hooks/use-users";
 import { useRolesQuery } from "@/hooks/use-roles";
 import { usePermissionsQuery } from "@/hooks/use-permissions";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/shared/page-header";
@@ -40,6 +41,7 @@ function StatCard({ label, value, isLoading, icon: Icon }: StatCardProps) {
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   // Cheap, already-available counts — a real analytics dashboard is a separate module.
   const usersQuery = useUsersQuery({ limit: 1 });
   const rolesQuery = useRolesQuery();
@@ -48,25 +50,27 @@ export default function DashboardPage() {
   return (
     <>
       <PageHeader
-        title={`Welcome back${user ? `, ${user.first_name}` : ""}`}
-        description="Here's what's happening across MBFshow today."
+        title={
+          user ? t("dashboard.welcomeBackNamed", { name: user.first_name }) : t("dashboard.welcomeBack")
+        }
+        description={t("dashboard.subtitle")}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
-          label="Total users"
+          label={t("dashboard.totalUsers")}
           value={usersQuery.data?.meta.total}
           isLoading={usersQuery.isLoading}
           icon={UsersIcon}
         />
         <StatCard
-          label="Roles"
+          label={t("dashboard.roles")}
           value={rolesQuery.data?.length}
           isLoading={rolesQuery.isLoading}
           icon={ShieldCheck}
         />
         <StatCard
-          label="Permissions"
+          label={t("dashboard.permissions")}
           value={permissionsQuery.data?.length}
           isLoading={permissionsQuery.isLoading}
           icon={KeyRound}

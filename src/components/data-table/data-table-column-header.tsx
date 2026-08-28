@@ -33,7 +33,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
       size="sm"
       onClick={() => column.toggleSorting(sorted === "asc")}
       className={cn(
-        "-ml-3 h-8 gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:text-foreground",
+        "-ms-3 h-8 gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:text-foreground",
         className,
       )}
     >

@@ -6,6 +6,7 @@ import type { OnChangeFn, PaginationState, RowData, SortingState } from "@tansta
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useTranslation } from "@/lib/i18n/language-provider";
 
 import type { DataTableColumnDef } from "./columns";
 import { DataTablePagination } from "./data-table-pagination";
@@ -70,8 +71,8 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     isLoading = false,
     searchPlaceholder,
     filters = [],
-    emptyTitle = "No results",
-    emptyDescription = "Try adjusting your search or filters.",
+    emptyTitle,
+    emptyDescription,
     toolbarActions,
     renderRowActions,
     getRowId,
@@ -79,20 +80,21 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
     totalLabel,
   } = props;
 
+  const { t } = useTranslation();
   const isServer = props.mode === "server";
 
   const finalColumns = React.useMemo<DataTableColumnDef<TData, unknown>[]>(() => {
     if (!renderRowActions) return columns;
     const actionsColumn: DataTableColumnDef<TData, unknown> = {
       id: ACTIONS_COLUMN_ID,
-      header: () => <span className="sr-only">Actions</span>,
+      header: () => <span className="sr-only">{t("common.actions")}</span>,
       cell: ({ row }) => <div className="flex justify-end">{renderRowActions(row.original)}</div>,
       enableSorting: false,
       enableColumnFilter: false,
       enableGlobalFilter: false,
     };
     return [...columns, actionsColumn];
-  }, [columns, renderRowActions]);
+  }, [columns, renderRowActions, t]);
 
   // Server-mode-only options (state/onPaginationChange/onSortingChange) are
   // spread in conditionally rather than set to `undefined` — `useTable`
@@ -196,8 +198,10 @@ export function DataTable<TData extends RowData>(props: DataTableProps<TData>) {
             ) : (
               <TableRow>
                 <TableCell colSpan={finalColumns.length} className="h-32 text-center">
-                  <p className="font-medium">{emptyTitle}</p>
-                  <p className="text-sm text-muted-foreground">{emptyDescription}</p>
+                  <p className="font-medium">{emptyTitle ?? t("common.noResults")}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {emptyDescription ?? t("common.tryAdjusting")}
+                  </p>
                 </TableCell>
               </TableRow>
             )}

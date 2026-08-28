@@ -6,7 +6,11 @@ import { useForm } from "react-hook-form";
 
 import { useRolesQuery } from "@/hooks/use-roles";
 import { useCreateStaffMutation } from "@/hooks/use-staff";
-import { createStaffSchema, type CreateStaffFormValues } from "@/lib/validations/staff.schema";
+import {
+  createStaffSchema,
+  type CreateStaffFormValues,
+} from "@/lib/validations/staff.schema";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -17,7 +21,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
 // The default USER role can never be assigned here (the backend rejects it —
@@ -41,11 +52,13 @@ const DEFAULT_VALUES: CreateStaffFormValues = {
 
 /** Creates a privileged (role-bearing) account — customers self-register from the app instead. */
 export function UserFormDialog({ open, onOpenChange }: UserFormDialogProps) {
+  const { t } = useTranslation();
   const rolesQuery = useRolesQuery();
   const createMutation = useCreateStaffMutation();
 
   const assignableRoles = (rolesQuery.data ?? []).filter(
-    (role) => role.name !== DEFAULT_ROLE_NAME && role.name !== SUPER_ADMIN_ROLE_NAME,
+    (role) =>
+      role.name !== DEFAULT_ROLE_NAME && role.name !== SUPER_ADMIN_ROLE_NAME,
   );
 
   const form = useForm<CreateStaffFormValues>({
@@ -65,22 +78,26 @@ export function UserFormDialog({ open, onOpenChange }: UserFormDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Create user account</DialogTitle>
+          <DialogTitle>{t("users.createDialog.title")}</DialogTitle>
           <DialogDescription>
-            A temporary password will be emailed to them, and they&apos;ll be asked to change it on
-            first login.
+            {t("users.createDialog.description")}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col gap-4"
+          >
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="first_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>First name</FormLabel>
+                    <FormLabel>
+                      {t("users.createDialog.firstNameLabel")}
+                    </FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -93,7 +110,9 @@ export function UserFormDialog({ open, onOpenChange }: UserFormDialogProps) {
                 name="last_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Last name</FormLabel>
+                    <FormLabel>
+                      {t("users.createDialog.lastNameLabel")}
+                    </FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -107,7 +126,7 @@ export function UserFormDialog({ open, onOpenChange }: UserFormDialogProps) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("users.createDialog.emailLabel")}</FormLabel>
                   <FormControl>
                     <Input type="email" {...field} />
                   </FormControl>
@@ -120,23 +139,30 @@ export function UserFormDialog({ open, onOpenChange }: UserFormDialogProps) {
               name="role_ids"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Roles</FormLabel>
+                  <FormLabel>{t("users.createDialog.rolesLabel")}</FormLabel>
                   <FormControl>
                     <div className="flex flex-col gap-2 rounded-md border border-border p-3">
                       {rolesQuery.isLoading ? (
-                        <p className="text-sm text-muted-foreground">Loading roles…</p>
+                        <p className="text-sm text-muted-foreground">
+                          {t("users.createDialog.loadingRoles")}
+                        </p>
                       ) : assignableRoles.length ? (
                         assignableRoles.map((role) => {
                           const checked = field.value.includes(role.id);
                           return (
-                            <label key={role.id} className="flex items-center gap-2.5 text-sm">
+                            <label
+                              key={role.id}
+                              className="flex items-center gap-2.5 text-sm"
+                            >
                               <Checkbox
                                 checked={checked}
                                 onCheckedChange={(value) => {
                                   field.onChange(
                                     value === true
                                       ? [...field.value, role.id]
-                                      : field.value.filter((id) => id !== role.id),
+                                      : field.value.filter(
+                                          (id) => id !== role.id,
+                                        ),
                                   );
                                 }}
                               />
@@ -145,7 +171,9 @@ export function UserFormDialog({ open, onOpenChange }: UserFormDialogProps) {
                           );
                         })
                       ) : (
-                        <p className="text-sm text-muted-foreground">No assignable roles yet.</p>
+                        <p className="text-sm text-muted-foreground">
+                          {t("users.createDialog.noAssignableRoles")}
+                        </p>
                       )}
                     </div>
                   </FormControl>
@@ -155,11 +183,17 @@ export function UserFormDialog({ open, onOpenChange }: UserFormDialogProps) {
             />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                {t("common.cancel")}
               </Button>
               <Button type="submit" disabled={createMutation.isPending}>
-                {createMutation.isPending ? "Creating…" : "Create account"}
+                {createMutation.isPending
+                  ? t("users.createDialog.submitting")
+                  : t("users.createDialog.submit")}
               </Button>
             </DialogFooter>
           </form>

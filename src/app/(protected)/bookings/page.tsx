@@ -10,21 +10,11 @@ import { DataTable } from "@/components/data-table/data-table";
 import type { DataTableFilterConfig } from "@/components/data-table/data-table-toolbar";
 import { Button } from "@/components/ui/button";
 import { useBookingsQuery } from "@/hooks/use-bookings";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import type { Booking, BookingsListParams } from "@/types/booking.types";
 
-import { bookingColumns } from "./columns";
+import { getBookingColumns } from "./columns";
 import { BookingDetailSheet } from "./booking-detail-sheet";
-
-const STATUS_FILTER: DataTableFilterConfig = {
-  id: "status",
-  label: "Status",
-  options: [
-    { label: "Pending payment", value: "PENDING_PAYMENT" },
-    { label: "Paid", value: "PAID" },
-    { label: "Cancelled", value: "CANCELLED" },
-    { label: "Expired", value: "EXPIRED" },
-  ],
-};
 
 const SORTABLE_COLUMN_IDS = new Set(["id", "status", "total_amount", "created_at"]);
 
@@ -37,6 +27,23 @@ export default function BookingsPage() {
 }
 
 function BookingsPageContent() {
+  const { t, locale } = useTranslation();
+  const bookingColumns = React.useMemo(() => getBookingColumns(locale), [locale]);
+
+  const STATUS_FILTER: DataTableFilterConfig = React.useMemo(
+    () => ({
+      id: "status",
+      label: t("bookings.filters.statusLabel"),
+      options: [
+        { label: t("bookings.status.pendingPayment"), value: "PENDING_PAYMENT" },
+        { label: t("bookings.status.paid"), value: "PAID" },
+        { label: t("bookings.status.cancelled"), value: "CANCELLED" },
+        { label: t("bookings.status.expired"), value: "EXPIRED" },
+      ],
+    }),
+    [t],
+  );
+
   const [pagination, setPagination] = React.useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [search, setSearch] = React.useState("");
@@ -74,10 +81,7 @@ function BookingsPageContent() {
 
   return (
     <>
-      <PageHeader
-        title="Bookings"
-        description="View bookings placed by customers through the mobile app."
-      />
+      <PageHeader title={t("bookings.title")} description={t("bookings.description")} />
 
       <DataTable
         mode="server"
@@ -94,14 +98,14 @@ function BookingsPageContent() {
         onSearchChange={handleSearchChange}
         filterValues={{ status }}
         onFilterChange={handleFilterChange}
-        searchPlaceholder="Search by customer name, email or event…"
+        searchPlaceholder={t("bookings.searchPlaceholder")}
         filters={[STATUS_FILTER]}
         getRowId={(row) => String(row.id)}
-        totalLabel="Bookings"
+        totalLabel={t("bookings.totalLabel")}
         renderRowActions={(booking) => (
           <Button variant="ghost" size="icon" className="size-8" onClick={() => handleViewBooking(booking)}>
             <Eye className="size-4" />
-            <span className="sr-only">View booking</span>
+            <span className="sr-only">{t("bookings.viewBooking")}</span>
           </Button>
         )}
       />

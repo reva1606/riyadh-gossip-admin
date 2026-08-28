@@ -3,7 +3,14 @@
 import * as React from "react";
 import { useQueries } from "@tanstack/react-query";
 import type { PaginationState, SortingState } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Plus, Power, PowerOff, Trash2 } from "lucide-react";
+import {
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Power,
+  PowerOff,
+  Trash2,
+} from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { PermissionGuard } from "@/components/layout/permission-guard";
@@ -33,22 +40,19 @@ import {
   useDeleteUserMutation,
   useUsersQuery,
 } from "@/hooks/use-users";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import type { User, UsersListParams } from "@/types/user.types";
 
 import { createUserColumns } from "./columns";
 import { UserEditSheet } from "./user-edit-sheet";
 import { UserFormDialog } from "./user-form-dialog";
 
-const STATUS_FILTER: DataTableFilterConfig = {
-  id: "status",
-  label: "Status",
-  options: [
-    { label: "Active", value: "ACTIVE" },
-    { label: "Inactive", value: "INACTIVE" },
-  ],
-};
-
-const SORTABLE_COLUMN_IDS = new Set(["first_name", "email", "status", "created_at"]);
+const SORTABLE_COLUMN_IDS = new Set([
+  "first_name",
+  "email",
+  "status",
+  "created_at",
+]);
 
 export default function UsersPage() {
   return (
@@ -63,8 +67,24 @@ function UsersPageContent() {
   const canCreate = hasPermission("user.create");
   const canUpdate = hasPermission("user.update");
   const canDelete = hasPermission("user.delete");
+  const { t, locale } = useTranslation();
 
-  const [pagination, setPagination] = React.useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
+  const statusFilter: DataTableFilterConfig = React.useMemo(
+    () => ({
+      id: "status",
+      label: t("users.filters.statusLabel"),
+      options: [
+        { label: t("common.active"), value: "ACTIVE" },
+        { label: t("common.inactive"), value: "INACTIVE" },
+      ],
+    }),
+    [t],
+  );
+
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [search, setSearch] = React.useState("");
   const [status, setStatus] = React.useState("");
@@ -79,7 +99,10 @@ function UsersPageContent() {
     limit: pagination.pageSize,
     search: search || undefined,
     status: (status || undefined) as UsersListParams["status"],
-    sortBy: sort && SORTABLE_COLUMN_IDS.has(sort.id) ? (sort.id as UsersListParams["sortBy"]) : undefined,
+    sortBy:
+      sort && SORTABLE_COLUMN_IDS.has(sort.id)
+        ? (sort.id as UsersListParams["sortBy"])
+        : undefined,
     sortOrder: sort ? (sort.desc ? "DESC" : "ASC") : undefined,
   };
 
@@ -88,7 +111,10 @@ function UsersPageContent() {
   const deactivateMutation = useDeactivateUserMutation();
   const deleteMutation = useDeleteUserMutation();
 
-  const users = React.useMemo(() => usersQuery.data?.data ?? [], [usersQuery.data]);
+  const users = React.useMemo(
+    () => usersQuery.data?.data ?? [],
+    [usersQuery.data],
+  );
 
   // User list rows don't include roles, so fetch each visible row's roles the
   // same way the Roles page fetches per-role permission counts — one cheap
@@ -109,7 +135,10 @@ function UsersPageContent() {
     return map;
   }, [users, roleQueries]);
 
-  const columns = React.useMemo(() => createUserColumns(rolesByUserId), [rolesByUserId]);
+  const columns = React.useMemo(
+    () => createUserColumns(locale, rolesByUserId),
+    [locale, rolesByUserId],
+  );
 
   function handleFilterChange(filterId: string, value: string) {
     if (filterId === "status") {
@@ -148,13 +177,13 @@ function UsersPageContent() {
   return (
     <>
       <PageHeader
-        title="Users"
-        description="View, edit and manage every account — customers and staff alike."
+        title={t("users.title")}
+        description={t("users.description")}
         actions={
           canCreate ? (
             <Button onClick={() => setCreateOpen(true)} className="gap-1.5">
               <Plus className="size-4" />
-              Add user
+              {t("users.createButton")}
             </Button>
           ) : undefined
         }
@@ -175,54 +204,72 @@ function UsersPageContent() {
         onSearchChange={handleSearchChange}
         filterValues={{ status }}
         onFilterChange={handleFilterChange}
-        searchPlaceholder="Search by name or email…"
-        filters={[STATUS_FILTER]}
+        searchPlaceholder={t("users.searchPlaceholder")}
+        filters={[statusFilter]}
         getRowId={(row) => String(row.id)}
-        totalLabel="Users"
+        totalLabel={t("users.totalLabel")}
         renderRowActions={(user) => {
           const isSelf = user.id === currentUser?.id;
-          const isSuperAdmin = (rolesByUserId[user.id] ?? []).some((role) => role.name === "SUPER_ADMIN");
-          const blockDeactivate = user.status === "ACTIVE" && (isSelf || isSuperAdmin);
+          const isSuperAdmin = (rolesByUserId[user.id] ?? []).some(
+            (role) => role.name === "SUPER_ADMIN",
+          );
+          const blockDeactivate =
+            user.status === "ACTIVE" && (isSelf || isSuperAdmin);
           const blockDelete = isSelf || isSuperAdmin;
           const blockedReason = isSelf
-            ? "your own account"
+            ? t("users.rowActions.yourOwnAccount")
             : isSuperAdmin
-              ? "a SUPER_ADMIN account"
+              ? t("users.rowActions.superAdminAccount")
               : undefined;
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="size-8">
                   <MoreHorizontal className="size-4" />
-                  <span className="sr-only">Row actions</span>
+                  <span className="sr-only">{t("common.rowActions")}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem disabled={!canUpdate} onClick={() => setEditingUser(user)}>
-                  <Pencil /> Edit
+                <DropdownMenuItem
+                  disabled={!canUpdate}
+                  onClick={() => setEditingUser(user)}
+                >
+                  <Pencil /> {t("common.edit")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   disabled={!canUpdate || blockDeactivate}
-                  title={blockDeactivate ? `You cannot deactivate ${blockedReason}` : undefined}
+                  title={
+                    blockDeactivate
+                      ? t("users.rowActions.cannotDeactivate", {
+                          reason: blockedReason ?? "",
+                        })
+                      : undefined
+                  }
                   onClick={() => void handleToggleStatus(user)}
                 >
                   {user.status === "ACTIVE" ? (
                     <>
-                      <PowerOff /> Deactivate
+                      <PowerOff /> {t("users.rowActions.deactivate")}
                     </>
                   ) : (
                     <>
-                      <Power /> Activate
+                      <Power /> {t("users.rowActions.activate")}
                     </>
                   )}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   variant="destructive"
                   disabled={!canDelete || blockDelete}
-                  title={blockDelete ? `You cannot delete ${blockedReason}` : undefined}
+                  title={
+                    blockDelete
+                      ? t("users.rowActions.cannotDelete", {
+                          reason: blockedReason ?? "",
+                        })
+                      : undefined
+                  }
                   onClick={() => setDeletingUser(user)}
                 >
-                  <Trash2 /> Delete
+                  <Trash2 /> {t("common.delete")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -238,28 +285,35 @@ function UsersPageContent() {
         onOpenChange={(open) => !open && setEditingUser(null)}
       />
 
-      <Dialog open={!!deletingUser} onOpenChange={(open) => !open && setDeletingUser(null)}>
+      <Dialog
+        open={!!deletingUser}
+        onOpenChange={(open) => !open && setDeletingUser(null)}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete user</DialogTitle>
+            <DialogTitle>{t("users.delete.title")}</DialogTitle>
             <DialogDescription>
-              This permanently deletes{" "}
+              {t("users.delete.descriptionPrefix")}{" "}
               <span className="font-medium text-foreground">
-                {deletingUser ? `${deletingUser.first_name} ${deletingUser.last_name}` : "this user"}
+                {deletingUser
+                  ? `${deletingUser.first_name} ${deletingUser.last_name}`
+                  : t("users.delete.descriptionFallback")}
               </span>
-              . This action cannot be undone.
+              . {t("users.delete.descriptionSuffix")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeletingUser(null)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               variant="destructive"
               disabled={deleteMutation.isPending}
               onClick={() => void handleConfirmDelete()}
             >
-              {deleteMutation.isPending ? "Deleting…" : "Delete"}
+              {deleteMutation.isPending
+                ? t("common.deleting")
+                : t("common.delete")}
             </Button>
           </DialogFooter>
         </DialogContent>

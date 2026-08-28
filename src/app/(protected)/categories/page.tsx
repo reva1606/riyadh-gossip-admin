@@ -23,9 +23,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/store/auth-context";
 import { useCategoriesQuery, useDeleteCategoryMutation } from "@/hooks/use-categories";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import type { Category } from "@/types/category.types";
 
-import { categoryColumns } from "./columns";
+import { getCategoryColumns } from "./columns";
 import { CategoryFormDialog } from "./category-form-dialog";
 
 const EMPTY_CATEGORIES: never[] = [];
@@ -43,6 +44,8 @@ function CategoriesPageContent() {
   const canCreate = hasPermission("category.create");
   const canUpdate = hasPermission("category.update");
   const canDelete = hasPermission("category.delete");
+  const { t, locale } = useTranslation();
+  const categoryColumns = React.useMemo(() => getCategoryColumns(locale), [locale]);
 
   const categoriesQuery = useCategoriesQuery();
   const deleteMutation = useDeleteCategoryMutation();
@@ -68,13 +71,13 @@ function CategoriesPageContent() {
   return (
     <>
       <PageHeader
-        title="Categories"
-        description="Manage the categories events can be organized under."
+        title={t("categories.title")}
+        description={t("categories.description")}
         actions={
           canCreate ? (
             <Button onClick={() => setFormState({ open: true, category: null })} className="gap-1.5">
               <Plus className="size-4" />
-              Create category
+              {t("categories.createButton")}
             </Button>
           ) : undefined
         }
@@ -85,27 +88,27 @@ function CategoriesPageContent() {
         columns={categoryColumns}
         data={categories}
         isLoading={categoriesQuery.isLoading}
-        searchPlaceholder="Search categories…"
-        totalLabel="Categories"
+        searchPlaceholder={t("categories.searchPlaceholder")}
+        totalLabel={t("categories.totalLabel")}
         getRowId={(row) => String(row.id)}
         renderRowActions={(category) => (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="size-8">
                 <MoreHorizontal className="size-4" />
-                <span className="sr-only">Row actions</span>
+                <span className="sr-only">{t("common.rowActions")}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem disabled={!canUpdate} onClick={() => setFormState({ open: true, category })}>
-                <Pencil /> Edit
+                <Pencil /> {t("common.edit")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
                 disabled={!canDelete}
                 onClick={() => setDeletingCategory(category)}
               >
-                <Trash2 /> Delete
+                <Trash2 /> {t("common.delete")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -121,23 +124,23 @@ function CategoriesPageContent() {
       <Dialog open={!!deletingCategory} onOpenChange={(open) => !open && setDeletingCategory(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete category</DialogTitle>
+            <DialogTitle>{t("categories.delete.title")}</DialogTitle>
             <DialogDescription>
-              This permanently deletes the{" "}
-              <span className="font-medium text-foreground">{deletingCategory?.name}</span> category. Categories
-              still used by an event can&apos;t be deleted.
+              {t("categories.delete.descriptionPrefix")}{" "}
+              <span className="font-medium text-foreground">{deletingCategory?.name}</span>{" "}
+              {t("categories.delete.descriptionSuffix")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeletingCategory(null)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               variant="destructive"
               disabled={deleteMutation.isPending}
               onClick={() => void handleConfirmDelete()}
             >
-              {deleteMutation.isPending ? "Deleting…" : "Delete"}
+              {deleteMutation.isPending ? t("common.deleting") : t("common.delete")}
             </Button>
           </DialogFooter>
         </DialogContent>

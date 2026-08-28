@@ -6,6 +6,7 @@ import type { RowData } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "@/lib/i18n/language-provider";
 
 import type { DataTableFeatures } from "./table-features";
 
@@ -18,8 +19,9 @@ interface DataTablePaginationProps<TData extends RowData> {
 export function DataTablePagination<TData extends RowData>({
   table,
   pageSizeOptions = [10, 20, 50, 100],
-  totalLabel = "Total",
+  totalLabel,
 }: DataTablePaginationProps<TData>) {
+  const { t } = useTranslation();
   const { pageIndex, pageSize } = table.state.pagination;
   const pageCount = table.getPageCount();
   const rowCount = table.getRowCount();
@@ -29,16 +31,17 @@ export function DataTablePagination<TData extends RowData>({
       <p className="text-sm text-muted-foreground">
         {rowCount > 0 ? (
           <>
-            {totalLabel}: <span className="font-medium text-foreground">{rowCount}</span>
+            {totalLabel ?? t("common.total")}:{" "}
+            <span className="font-medium text-foreground">{rowCount}</span>
           </>
         ) : (
-          "No results"
+          t("common.noResults")
         )}
       </p>
 
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Rows per page</span>
+          <span className="text-sm text-muted-foreground">{t("common.rowsPerPage")}</span>
           <Select value={String(pageSize)} onValueChange={(value) => table.setPageSize(Number(value))}>
             <SelectTrigger className="h-8 w-[70px]">
               <SelectValue />
@@ -54,7 +57,7 @@ export function DataTablePagination<TData extends RowData>({
         </div>
 
         <p className="text-sm text-muted-foreground">
-          Page {pageCount === 0 ? 0 : pageIndex + 1} of {Math.max(pageCount, 1)}
+          {t("common.pageOf", { current: pageCount === 0 ? 0 : pageIndex + 1, total: Math.max(pageCount, 1) })}
         </p>
 
         <div className="flex items-center gap-1">
@@ -65,9 +68,9 @@ export function DataTablePagination<TData extends RowData>({
             className="size-8"
             onClick={() => table.firstPage()}
             disabled={!table.getCanPreviousPage()}
-            aria-label="First page"
+            aria-label={t("common.firstPage")}
           >
-            <ChevronsLeft className="size-4" />
+            <ChevronsLeft className="size-4 rtl:-scale-x-100" />
           </Button>
           <Button
             type="button"
@@ -76,9 +79,9 @@ export function DataTablePagination<TData extends RowData>({
             className="size-8"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            aria-label="Previous page"
+            aria-label={t("common.previousPage")}
           >
-            <ChevronLeft className="size-4" />
+            <ChevronLeft className="size-4 rtl:-scale-x-100" />
           </Button>
           <Button
             type="button"
@@ -87,9 +90,9 @@ export function DataTablePagination<TData extends RowData>({
             className="size-8"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            aria-label="Next page"
+            aria-label={t("common.nextPage")}
           >
-            <ChevronRight className="size-4" />
+            <ChevronRight className="size-4 rtl:-scale-x-100" />
           </Button>
           <Button
             type="button"
@@ -98,9 +101,9 @@ export function DataTablePagination<TData extends RowData>({
             className="size-8"
             onClick={() => table.lastPage()}
             disabled={!table.getCanNextPage()}
-            aria-label="Last page"
+            aria-label={t("common.lastPage")}
           >
-            <ChevronsRight className="size-4" />
+            <ChevronsRight className="size-4 rtl:-scale-x-100" />
           </Button>
         </div>
       </div>

@@ -22,13 +22,13 @@ function DropdownMenuSubTrigger({
       className={cn(
         "flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none",
         "focus:bg-muted data-[state=open]:bg-muted",
-        inset && "pl-8",
+        inset && "ps-8",
         className,
       )}
       {...props}
     >
       {children}
-      <ChevronRight className="ml-auto size-4" />
+      <ChevronRight className="ms-auto size-4 rtl:-scale-x-100" />
     </DropdownMenuPrimitive.SubTrigger>
   );
 }
@@ -86,7 +86,7 @@ function DropdownMenuItem({
         "transition-colors focus:bg-muted data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10",
         "[&_svg]:size-4 [&_svg]:shrink-0",
-        inset && "pl-8",
+        inset && "ps-8",
         className,
       )}
       {...props}
@@ -103,14 +103,14 @@ function DropdownMenuCheckboxItem({
   return (
     <DropdownMenuPrimitive.CheckboxItem
       className={cn(
-        "relative flex cursor-pointer items-center gap-2 rounded-md py-1.5 pr-2 pl-8 text-sm outline-none select-none",
+        "relative flex cursor-pointer items-center gap-2 rounded-md py-1.5 pe-2 ps-8 text-sm outline-none select-none",
         "transition-colors focus:bg-muted data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className,
       )}
       checked={checked}
       {...props}
     >
-      <span className="absolute left-2 flex size-3.5 items-center justify-center">
+      <span className="absolute inset-s-2 flex size-3.5 items-center justify-center">
         <DropdownMenuPrimitive.ItemIndicator>
           <Check className="size-4" />
         </DropdownMenuPrimitive.ItemIndicator>
@@ -128,13 +128,13 @@ function DropdownMenuRadioItem({
   return (
     <DropdownMenuPrimitive.RadioItem
       className={cn(
-        "relative flex cursor-pointer items-center gap-2 rounded-md py-1.5 pr-2 pl-8 text-sm outline-none select-none",
+        "relative flex cursor-pointer items-center gap-2 rounded-md py-1.5 pe-2 ps-8 text-sm outline-none select-none",
         "transition-colors focus:bg-muted data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className,
       )}
       {...props}
     >
-      <span className="absolute left-2 flex size-3.5 items-center justify-center">
+      <span className="absolute inset-s-2 flex size-3.5 items-center justify-center">
         <DropdownMenuPrimitive.ItemIndicator>
           <Circle className="size-2 fill-current" />
         </DropdownMenuPrimitive.ItemIndicator>
@@ -153,7 +153,7 @@ function DropdownMenuLabel({
     <DropdownMenuPrimitive.Label
       className={cn(
         "px-2 py-1.5 text-xs font-medium text-muted-foreground",
-        inset && "pl-8",
+        inset && "ps-8",
         className,
       )}
       {...props}
@@ -176,7 +176,7 @@ function DropdownMenuSeparator({
 function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
-      className={cn("ml-auto text-xs tracking-widest text-muted-foreground", className)}
+      className={cn("ms-auto text-xs tracking-widest text-muted-foreground", className)}
       {...props}
     />
   );

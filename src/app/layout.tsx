@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
+import { Geist, Geist_Mono, Noto_Sans_Arabic } from "next/font/google";
 
 import { Providers } from "@/components/shared/providers";
+import { DEFAULT_LOCALE, LOCALE_COOKIE, LOCALE_DIR, isLocale } from "@/lib/i18n/config";
 
 import "./globals.css";
 
@@ -15,6 +17,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const notoSansArabic = Noto_Sans_Arabic({
+  variable: "--font-noto-sans-arabic",
+  subsets: ["arabic"],
+});
+
 export const metadata: Metadata = {
   title: {
     default: "MBFshow Admin",
@@ -23,15 +30,20 @@ export const metadata: Metadata = {
   description: "Admin panel for the MBFshow entertainment platform.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const cookieStore = await cookies();
+  const cookieLocale = cookieStore.get(LOCALE_COOKIE)?.value;
+  const locale = isLocale(cookieLocale) ? cookieLocale : DEFAULT_LOCALE;
+
   return (
     <html
-      lang="en"
+      lang={locale}
+      dir={LOCALE_DIR[locale]}
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${notoSansArabic.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <Providers>{children}</Providers>
+        <Providers initialLocale={locale}>{children}</Providers>
       </body>
     </html>
   );

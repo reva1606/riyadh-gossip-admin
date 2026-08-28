@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "@/store/auth-context";
 import { useChangePassword } from "@/hooks/use-change-password";
 import { toApiError } from "@/lib/api/api-error";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { changePasswordSchema, type ChangePasswordFormValues } from "@/lib/validations/auth.schema";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -15,6 +16,7 @@ import { PasswordInput } from "@/components/forms/password-input";
 export function ChangePasswordForm() {
   const { logout } = useAuth();
   const changePassword = useChangePassword();
+  const { t } = useTranslation();
 
   const form = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
@@ -26,7 +28,7 @@ export function ChangePasswordForm() {
       { current_password: values.current_password, new_password: values.new_password },
       {
         onSuccess: () => {
-          toast.success("Password changed. Please sign in again.");
+          toast.success(t("settings.changePassword.successToast"));
           void logout();
         },
         onError: (error) => toast.error(toApiError(error).message),
@@ -42,7 +44,7 @@ export function ChangePasswordForm() {
           name="current_password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Current password</FormLabel>
+              <FormLabel>{t("settings.changePassword.currentPassword")}</FormLabel>
               <FormControl>
                 <PasswordInput autoComplete="current-password" {...field} />
               </FormControl>
@@ -55,7 +57,7 @@ export function ChangePasswordForm() {
           name="new_password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>New password</FormLabel>
+              <FormLabel>{t("settings.changePassword.newPassword")}</FormLabel>
               <FormControl>
                 <PasswordInput autoComplete="new-password" {...field} />
               </FormControl>
@@ -68,7 +70,7 @@ export function ChangePasswordForm() {
           name="confirm_password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm new password</FormLabel>
+              <FormLabel>{t("settings.changePassword.confirmPassword")}</FormLabel>
               <FormControl>
                 <PasswordInput autoComplete="new-password" {...field} />
               </FormControl>
@@ -77,12 +79,10 @@ export function ChangePasswordForm() {
           )}
         />
 
-        <p className="text-xs text-muted-foreground">
-          Changing your password signs you out of every device, including this one.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("settings.changePassword.signOutNotice")}</p>
 
         <Button type="submit" disabled={changePassword.isPending} className="mt-1 self-start">
-          {changePassword.isPending ? "Changing…" : "Change password"}
+          {changePassword.isPending ? t("settings.changePassword.submitting") : t("settings.changePassword.submit")}
         </Button>
       </form>
     </Form>

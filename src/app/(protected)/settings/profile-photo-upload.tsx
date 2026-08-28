@@ -7,6 +7,7 @@ import { Camera, Loader2, X } from "lucide-react";
 import { useAuth } from "@/store/auth-context";
 import { useRemoveProfilePhotoMutation, useUpdateProfilePhotoMutation } from "@/hooks/use-profile-photo";
 import { env } from "@/config/env";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
@@ -21,6 +22,7 @@ function getInitials(firstName?: string, lastName?: string) {
 
 export function ProfilePhotoUpload() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const updateMutation = useUpdateProfilePhotoMutation();
   const removeMutation = useRemoveProfilePhotoMutation();
@@ -34,11 +36,11 @@ export function ProfilePhotoUpload() {
     if (!file) return;
 
     if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-      toast.error("Please choose a JPEG, PNG, WEBP or GIF image.");
+      toast.error(t("settings.photo.invalidType"));
       return;
     }
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      toast.error("Image must be 5MB or smaller.");
+      toast.error(t("settings.photo.tooLarge"));
       return;
     }
 
@@ -48,7 +50,7 @@ export function ProfilePhotoUpload() {
   return (
     <div className="flex items-center gap-4">
       <Avatar className="size-16">
-        {avatarUrl && <AvatarImage src={avatarUrl} alt="Profile photo" />}
+        {avatarUrl && <AvatarImage src={avatarUrl} alt={t("settings.photo.photoAlt")} />}
         <AvatarFallback className="text-base">{getInitials(user?.first_name, user?.last_name)}</AvatarFallback>
       </Avatar>
 
@@ -62,7 +64,7 @@ export function ProfilePhotoUpload() {
             onClick={() => fileInputRef.current?.click()}
           >
             {updateMutation.isPending ? <Loader2 className="animate-spin" /> : <Camera />}
-            {user?.avatar_url ? "Change photo" : "Upload photo"}
+            {user?.avatar_url ? t("settings.photo.changePhoto") : t("settings.photo.uploadPhoto")}
           </Button>
           {user?.avatar_url && (
             <Button
@@ -73,11 +75,11 @@ export function ProfilePhotoUpload() {
               onClick={() => removeMutation.mutate()}
             >
               <X />
-              Remove
+              {t("settings.photo.remove")}
             </Button>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">JPEG, PNG, WEBP or GIF. Max 5MB.</p>
+        <p className="text-xs text-muted-foreground">{t("settings.photo.helpText")}</p>
       </div>
 
       <input

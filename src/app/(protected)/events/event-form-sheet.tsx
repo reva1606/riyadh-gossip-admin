@@ -8,6 +8,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { useCategoriesQuery } from "@/hooks/use-categories";
 import { useCreateEventMutation, useUpdateEventMutation } from "@/hooks/use-events";
 import { eventFormSchema, type EventFormValues } from "@/lib/validations/event.schema";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { DateTimePicker } from "@/components/shared/date-time-picker";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -21,17 +22,25 @@ import type { Event } from "@/types/event.types";
 import { TicketClassesFieldArray } from "./ticket-classes-field-array";
 import { EventImageUpload } from "./event-image-upload";
 
+// The dynamic-import loading fallback is rendered by React as part of the
+// tree, so it can call hooks (useTranslation) even though `dynamic()` itself
+// is invoked at module scope.
+function MapLoadingFallback() {
+  const { t } = useTranslation();
+  return (
+    <div className="flex h-64 w-full items-center justify-center rounded-lg border border-border text-sm text-muted-foreground">
+      {t("events.form.loadingMap")}
+    </div>
+  );
+}
+
 // Leaflet touches `window` on import, so it can only ever run client-side —
 // ssr:false keeps it out of the server render entirely.
 const LocationMapPicker = dynamic(
   () => import("./location-map-picker").then((mod) => mod.LocationMapPicker),
   {
     ssr: false,
-    loading: () => (
-      <div className="flex h-64 w-full items-center justify-center rounded-lg border border-border text-sm text-muted-foreground">
-        Loading map…
-      </div>
-    ),
+    loading: MapLoadingFallback,
   },
 );
 
@@ -78,6 +87,7 @@ function toDefaultValues(event: Event | null | undefined): EventFormValues {
 
 export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProps) {
   const isEdit = !!event;
+  const { t } = useTranslation();
   const categoriesQuery = useCategoriesQuery();
   const createMutation = useCreateEventMutation();
   const updateMutation = useUpdateEventMutation();
@@ -128,17 +138,16 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
     }
   }
 
+  const sheetTitle =
+    isEdit && event ? t("events.form.editTitle", { title: event.title }) : t("events.form.createTitle");
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="right"
-        title={isEdit ? `Edit ${event.title}` : "Create event"}
-        className="w-full gap-0 sm:max-w-2xl"
-      >
+      <SheetContent side="right" title={sheetTitle} className="w-full gap-0 sm:max-w-2xl">
         <SheetHeader className="border-b border-border">
-          <h2 className="text-lg font-semibold">{isEdit ? `Edit ${event.title}` : "Create event"}</h2>
+          <h2 className="text-lg font-semibold">{sheetTitle}</h2>
           <p className="text-sm text-muted-foreground">
-            {isEdit ? "Update this event's details." : "Fill in the details for a new event."}
+            {isEdit ? t("events.form.editDescription") : t("events.form.createDescription")}
           </p>
         </SheetHeader>
 
@@ -150,9 +159,9 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>{t("events.form.titleLabel")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. MBFshow Music Night" {...field} />
+                      <Input placeholder={t("events.form.titlePlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -164,9 +173,9 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t("events.form.descriptionLabel")}</FormLabel>
                     <FormControl>
-                      <Textarea rows={4} placeholder="What's this event about?" {...field} />
+                      <Textarea rows={4} placeholder={t("events.form.descriptionPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -179,9 +188,13 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
                   name="start_date"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Starts</FormLabel>
+                      <FormLabel>{t("events.form.startsLabel")}</FormLabel>
                       <FormControl>
-                        <DateTimePicker value={field.value} onChange={field.onChange} placeholder="Start date" />
+                        <DateTimePicker
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder={t("events.form.startsPlaceholder")}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -193,9 +206,13 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
                   name="end_date"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Ends</FormLabel>
+                      <FormLabel>{t("events.form.endsLabel")}</FormLabel>
                       <FormControl>
-                        <DateTimePicker value={field.value} onChange={field.onChange} placeholder="End date" />
+                        <DateTimePicker
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder={t("events.form.endsPlaceholder")}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -209,11 +226,11 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
                   name="category_id"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category</FormLabel>
+                      <FormLabel>{t("events.form.categoryLabel")}</FormLabel>
                       <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a category" />
+                            <SelectValue placeholder={t("events.form.categoryPlaceholder")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -234,9 +251,9 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
                   name="location"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Location</FormLabel>
+                      <FormLabel>{t("events.form.locationLabel")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Boulevard City, Riyadh" {...field} />
+                        <Input placeholder={t("events.form.locationPlaceholder")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -245,10 +262,8 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
               </div>
 
               <div>
-                <Label>Map location</Label>
-                <p className="mb-2 text-xs text-muted-foreground">
-                  Click the map (or drag the pin) to set the exact coordinates.
-                </p>
+                <Label>{t("events.form.mapLocationLabel")}</Label>
+                <p className="mb-2 text-xs text-muted-foreground">{t("events.form.mapLocationHelp")}</p>
                 <LocationMapPicker
                   latitude={latitude ?? null}
                   longitude={longitude ?? null}
@@ -267,7 +282,7 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
                 <div className="mt-2 grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="latitude-input" className="text-xs text-muted-foreground">
-                      Latitude
+                      {t("events.form.latitudeLabel")}
                     </Label>
                     <Input
                       id="latitude-input"
@@ -285,7 +300,7 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
                   </div>
                   <div>
                     <Label htmlFor="longitude-input" className="text-xs text-muted-foreground">
-                      Longitude
+                      {t("events.form.longitudeLabel")}
                     </Label>
                     <Input
                       id="longitude-input"
@@ -312,9 +327,9 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
                 name="how_to_get_there"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>How to get there</FormLabel>
+                    <FormLabel>{t("events.form.howToGetThereLabel")}</FormLabel>
                     <FormControl>
-                      <Textarea rows={3} placeholder="Directions, parking, entry gate, etc." {...field} />
+                      <Textarea rows={3} placeholder={t("events.form.howToGetTherePlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -322,7 +337,7 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
               />
 
               <div>
-                <Label>Ticket classes</Label>
+                <Label>{t("events.form.ticketClassesLabel")}</Label>
                 <div className="mt-2">
                   <TicketClassesFieldArray control={form.control} />
                 </div>
@@ -332,14 +347,18 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
               </div>
 
               <div>
-                <Label>Images</Label>
+                <Label>{t("events.form.imagesLabel")}</Label>
                 <div className="mt-2">
                   <EventImageUpload value={imageUrls} onChange={setImageUrls} />
                 </div>
               </div>
 
               <Button type="submit" disabled={mutation.isPending} className="mt-2 self-start">
-                {mutation.isPending ? "Saving…" : isEdit ? "Save changes" : "Create event"}
+                {mutation.isPending
+                  ? t("common.saving")
+                  : isEdit
+                    ? t("events.form.saveChanges")
+                    : t("events.createButton")}
               </Button>
             </form>
           </Form>

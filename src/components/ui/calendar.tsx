@@ -41,8 +41,8 @@ function Calendar({
           buttonVariants({ variant: "ghost" }),
           "size-9 rounded-md p-0 font-normal aria-selected:opacity-100",
         ),
-        range_start: "day-range-start rounded-l-md bg-accent",
-        range_end: "day-range-end rounded-r-md bg-accent",
+        range_start: "day-range-start rounded-s-md bg-accent",
+        range_end: "day-range-end rounded-e-md bg-accent",
         selected: "[&>button]:bg-primary [&>button]:text-primary-foreground [&>button]:hover:bg-primary/90",
         today: "[&>button]:border [&>button]:border-ring",
         outside: "text-muted-foreground opacity-50",
@@ -53,9 +53,9 @@ function Calendar({
       components={{
         Chevron: ({ orientation, ...chevronProps }) =>
           orientation === "left" ? (
-            <ChevronLeft className="size-4" {...chevronProps} />
+            <ChevronLeft className="size-4 rtl:-scale-x-100" {...chevronProps} />
           ) : (
-            <ChevronRight className="size-4" {...chevronProps} />
+            <ChevronRight className="size-4 rtl:-scale-x-100" {...chevronProps} />
           ),
         // `day`/`modifiers` are react-day-picker-only props that must not
         // reach the underlying native <button>, so they're destructured out

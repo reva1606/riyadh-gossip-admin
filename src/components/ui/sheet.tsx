@@ -34,9 +34,13 @@ const sheetVariants = cva(
         top: "inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
         bottom:
           "inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-        left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
+        // "left"/"right" name which screen edge the sheet docks to in LTR; the
+        // position/border are logical (start/end) so they mirror automatically
+        // under dir="rtl", and the slide transforms — which can't be logical,
+        // since CSS transforms don't respect `dir` — are flipped via `rtl:`.
+        left: "inset-y-0 inset-s-0 h-full w-3/4 border-e data-[state=closed]:slide-out-to-left rtl:data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-left rtl:data-[state=open]:slide-in-from-right sm:max-w-sm",
         right:
-          "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+          "inset-y-0 inset-e-0 h-full w-3/4 border-s data-[state=closed]:slide-out-to-right rtl:data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-right rtl:data-[state=open]:slide-in-from-left sm:max-w-sm",
       },
     },
     defaultVariants: { side: "right" },
@@ -59,7 +63,7 @@ function SheetContent({
           <DialogPrimitive.Title>{title}</DialogPrimitive.Title>
         </VisuallyHidden>
         {children}
-        <DialogPrimitive.Close className="absolute top-4 right-4 rounded-md p-1 opacity-70 transition-opacity hover:opacity-100 focus:outline-none">
+        <DialogPrimitive.Close className="absolute top-4 inset-e-4 rounded-md p-1 opacity-70 transition-opacity hover:opacity-100 focus:outline-none">
           <X className="size-4" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>

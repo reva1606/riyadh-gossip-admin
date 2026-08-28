@@ -11,6 +11,7 @@ import { ROUTES } from "@/config/routes";
 import { useForgotPassword } from "@/hooks/use-forgot-password";
 import { toApiError } from "@/lib/api/api-error";
 import { forgotPasswordSchema, type ForgotPasswordFormValues } from "@/lib/validations/auth.schema";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -26,6 +27,7 @@ import { Input } from "@/components/ui/input";
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const forgotPassword = useForgotPassword();
+  const { t } = useTranslation();
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -35,7 +37,7 @@ export default function ForgotPasswordPage() {
   function onSubmit(values: ForgotPasswordFormValues) {
     forgotPassword.mutate(values, {
       onSuccess: () => {
-        toast.success("A verification code has been sent to your email.");
+        toast.success(t("auth.verificationSent"));
         router.push(`${ROUTES.resetPassword}?email=${encodeURIComponent(values.email)}`);
       },
       onError: (error) => toast.error(toApiError(error).message),
@@ -45,10 +47,8 @@ export default function ForgotPasswordPage() {
   return (
     <Card className="border-none bg-transparent shadow-none sm:border-border sm:bg-card sm:shadow-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Forgot password?</CardTitle>
-        <CardDescription>
-          Enter the email linked to your account and we&apos;ll send you a verification code.
-        </CardDescription>
+        <CardTitle className="text-2xl">{t("auth.forgotTitle")}</CardTitle>
+        <CardDescription>{t("auth.forgotSubtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("auth.email")}</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -73,15 +73,15 @@ export default function ForgotPasswordPage() {
             />
 
             <Button type="submit" size="lg" disabled={forgotPassword.isPending} className="mt-1">
-              {forgotPassword.isPending ? "Sending…" : "Send verification code"}
+              {forgotPassword.isPending ? t("auth.sending") : t("auth.sendCode")}
             </Button>
 
             <Link
               href={ROUTES.login}
               className="flex items-center justify-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground"
             >
-              <ArrowLeft className="size-3.5" />
-              Back to sign in
+              <ArrowLeft className="size-3.5 rtl:-scale-x-100" />
+              {t("auth.backToSignIn")}
             </Link>
           </form>
         </Form>

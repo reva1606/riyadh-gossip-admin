@@ -7,6 +7,7 @@ import type { EventFormValues } from "@/lib/validations/event.schema";
 import { Button } from "@/components/ui/button";
 import { FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/lib/i18n/language-provider";
 
 interface TicketClassesFieldArrayProps {
   control: Control<EventFormValues>;
@@ -14,6 +15,7 @@ interface TicketClassesFieldArrayProps {
 
 /** Repeater for an event's ticket classes — name/price/count rows, add/remove. */
 export function TicketClassesFieldArray({ control }: TicketClassesFieldArrayProps) {
+  const { t } = useTranslation();
   const { fields, append, remove } = useFieldArray({ control, name: "ticket_classes" });
 
   return (
@@ -26,7 +28,7 @@ export function TicketClassesFieldArray({ control }: TicketClassesFieldArrayProp
             render={({ field: nameField }) => (
               <FormItem className="flex-1">
                 <FormControl>
-                  <Input placeholder="e.g. VIP" {...nameField} />
+                  <Input placeholder={t("events.ticketClasses.namePlaceholder")} {...nameField} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -38,7 +40,13 @@ export function TicketClassesFieldArray({ control }: TicketClassesFieldArrayProp
             render={({ field: priceField }) => (
               <FormItem className="w-28">
                 <FormControl>
-                  <Input type="number" min={0} step="0.01" placeholder="Price" {...priceField} />
+                  <Input
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    placeholder={t("events.ticketClasses.pricePlaceholder")}
+                    {...priceField}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -50,7 +58,13 @@ export function TicketClassesFieldArray({ control }: TicketClassesFieldArrayProp
             render={({ field: countField }) => (
               <FormItem className="w-24">
                 <FormControl>
-                  <Input type="number" min={0} step="1" placeholder="Count" {...countField} />
+                  <Input
+                    type="number"
+                    min={0}
+                    step="1"
+                    placeholder={t("events.ticketClasses.countPlaceholder")}
+                    {...countField}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -63,7 +77,7 @@ export function TicketClassesFieldArray({ control }: TicketClassesFieldArrayProp
             className="mt-0.5 shrink-0"
             disabled={fields.length <= 1}
             onClick={() => remove(index)}
-            aria-label="Remove ticket class"
+            aria-label={t("events.ticketClasses.removeAria")}
           >
             <X className="size-4" />
           </Button>
@@ -78,7 +92,7 @@ export function TicketClassesFieldArray({ control }: TicketClassesFieldArrayProp
         onClick={() => append({ name: "", price: 0, count: 0 })}
       >
         <Plus className="size-4" />
-        Add ticket class
+        {t("events.ticketClasses.addButton")}
       </Button>
     </div>
   );

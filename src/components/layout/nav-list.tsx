@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/config/navigation";
 import { useAuth } from "@/store/auth-context";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import {
   Tooltip,
   TooltipContent,
@@ -24,6 +25,7 @@ function isActive(pathname: string, href: string) {
 export function NavList({ collapsed = false, onNavigate }: NavListProps) {
   const pathname = usePathname();
   const { hasPermission } = useAuth();
+  const { t } = useTranslation();
 
   const items = NAV_ITEMS.filter((item) => !item.permission || hasPermission(item.permission));
 
@@ -45,9 +47,9 @@ export function NavList({ collapsed = false, onNavigate }: NavListProps) {
             )}
           >
             <item.icon className="size-4.5 shrink-0" />
-            {!collapsed && <span className="truncate">{item.label}</span>}
+            {!collapsed && <span className="truncate">{t(item.labelKey)}</span>}
             {active && !collapsed && (
-              <span className="ml-auto size-1.5 rounded-full bg-primary" aria-hidden />
+              <span className="ms-auto size-1.5 rounded-full bg-primary" aria-hidden />
             )}
           </Link>
         );
@@ -57,7 +59,7 @@ export function NavList({ collapsed = false, onNavigate }: NavListProps) {
         return (
           <Tooltip key={item.href}>
             <TooltipTrigger asChild>{link}</TooltipTrigger>
-            <TooltipContent side="right">{item.label}</TooltipContent>
+            <TooltipContent side="right">{t(item.labelKey)}</TooltipContent>
           </Tooltip>
         );
       })}

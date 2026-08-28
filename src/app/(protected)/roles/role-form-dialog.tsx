@@ -4,8 +4,15 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { useCreateRoleMutation, useUpdateRoleMutation } from "@/hooks/use-roles";
-import { roleFormSchema, type RoleFormValues } from "@/lib/validations/role.schema";
+import {
+  useCreateRoleMutation,
+  useUpdateRoleMutation,
+} from "@/hooks/use-roles";
+import {
+  roleFormSchema,
+  type RoleFormValues,
+} from "@/lib/validations/role.schema";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,7 +22,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import type { RoleDto } from "@/types/role.types";
 
@@ -26,8 +40,13 @@ interface RoleFormDialogProps {
   role?: RoleDto | null;
 }
 
-export function RoleFormDialog({ open, onOpenChange, role }: RoleFormDialogProps) {
+export function RoleFormDialog({
+  open,
+  onOpenChange,
+  role,
+}: RoleFormDialogProps) {
   const isEdit = !!role;
+  const { t } = useTranslation();
   const createMutation = useCreateRoleMutation();
   const updateMutation = useUpdateRoleMutation();
   const mutation = isEdit ? updateMutation : createMutation;
@@ -39,14 +58,23 @@ export function RoleFormDialog({ open, onOpenChange, role }: RoleFormDialogProps
 
   React.useEffect(() => {
     if (open) {
-      form.reset({ name: role?.name ?? "", description: role?.description ?? "" });
+      form.reset({
+        name: role?.name ?? "",
+        description: role?.description ?? "",
+      });
     }
   }, [open, role, form]);
 
   function onSubmit(values: RoleFormValues) {
-    const payload = { name: values.name, description: values.description || undefined };
+    const payload = {
+      name: values.name,
+      description: values.description || undefined,
+    };
     if (isEdit && role) {
-      updateMutation.mutate({ id: role.id, payload }, { onSuccess: () => onOpenChange(false) });
+      updateMutation.mutate(
+        { id: role.id, payload },
+        { onSuccess: () => onOpenChange(false) },
+      );
     } else {
       createMutation.mutate(payload, { onSuccess: () => onOpenChange(false) });
     }
@@ -56,24 +84,32 @@ export function RoleFormDialog({ open, onOpenChange, role }: RoleFormDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit role" : "Create role"}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? t("roles.form.editTitle") : t("roles.form.createTitle")}
+          </DialogTitle>
           <DialogDescription>
             {isEdit
-              ? "Update this role's name and description."
-              : "Define a new role. You can assign permissions after creating it."}
+              ? t("roles.form.editDescription")
+              : t("roles.form.createDescription")}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col gap-4"
+          >
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>{t("roles.form.nameLabel")}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. EVENT_MANAGER" {...field} />
+                    <Input
+                      placeholder={t("roles.form.namePlaceholder")}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -84,9 +120,12 @@ export function RoleFormDialog({ open, onOpenChange, role }: RoleFormDialogProps
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t("roles.form.descriptionLabel")}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Optional" {...field} />
+                    <Input
+                      placeholder={t("roles.form.descriptionPlaceholder")}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -94,11 +133,19 @@ export function RoleFormDialog({ open, onOpenChange, role }: RoleFormDialogProps
             />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                {t("common.cancel")}
               </Button>
               <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? "Saving…" : isEdit ? "Save changes" : "Create role"}
+                {mutation.isPending
+                  ? t("common.saving")
+                  : isEdit
+                    ? t("roles.form.saveChanges")
+                    : t("roles.createButton")}
               </Button>
             </DialogFooter>
           </form>

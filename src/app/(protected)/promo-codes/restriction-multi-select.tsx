@@ -4,6 +4,7 @@ import * as React from "react";
 import { ChevronsUpDown, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -49,6 +50,7 @@ export function RestrictionMultiSelect({
   emptyLabel,
   disabled,
 }: RestrictionMultiSelectProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
   const selectedIds = React.useMemo(() => new Set(selectedOptions.map((option) => option.id)), [selectedOptions]);
 
@@ -83,7 +85,9 @@ export function RestrictionMultiSelect({
             className="w-full justify-between font-normal"
           >
             <span className={cn(selectedOptions.length === 0 && "text-muted-foreground")}>
-              {selectedOptions.length > 0 ? `${selectedOptions.length} selected` : placeholder}
+              {selectedOptions.length > 0
+                ? t("promoCodes.restrictionSelect.selectedCount", { count: selectedOptions.length })
+                : placeholder}
             </span>
             <ChevronsUpDown className="size-4 text-muted-foreground" />
           </Button>
@@ -129,14 +133,14 @@ export function RestrictionMultiSelect({
       {selectedOptions.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {selectedOptions.map((option) => (
-            <Badge key={option.id} variant="secondary" className="gap-1 pr-1">
+            <Badge key={option.id} variant="secondary" className="gap-1 pe-1">
               {option.label}
               {!disabled && (
                 <button
                   type="button"
                   onClick={() => remove(option.id)}
                   className="rounded-full p-0.5 hover:bg-background/60"
-                  aria-label={`Remove ${option.label}`}
+                  aria-label={t("promoCodes.restrictionSelect.removeAria", { label: option.label })}
                 >
                   <X className="size-3" />
                 </button>

@@ -2,7 +2,13 @@
 
 import * as React from "react";
 import { useQueries } from "@tanstack/react-query";
-import { MoreHorizontal, Pencil, Plus, ShieldCheck, Trash2 } from "lucide-react";
+import {
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  ShieldCheck,
+  Trash2,
+} from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { PermissionGuard } from "@/components/layout/permission-guard";
@@ -26,6 +32,7 @@ import { useAuth } from "@/store/auth-context";
 import { useDeleteRoleMutation, useRolesQuery } from "@/hooks/use-roles";
 import { QUERY_KEYS } from "@/config/constants";
 import { rolesService } from "@/services/roles.service";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import type { RoleDto } from "@/types/role.types";
 
 import { createRoleColumns } from "./columns";
@@ -49,15 +56,21 @@ function RolesPageContent() {
   const canCreate = hasPermission("role.create");
   const canUpdate = hasPermission("role.update");
   const canDelete = hasPermission("role.delete");
+  const { t, locale } = useTranslation();
 
   const rolesQuery = useRolesQuery();
   const deleteMutation = useDeleteRoleMutation();
 
-  const [formState, setFormState] = React.useState<{ open: boolean; role: RoleDto | null }>({
+  const [formState, setFormState] = React.useState<{
+    open: boolean;
+    role: RoleDto | null;
+  }>({
     open: false,
     role: null,
   });
-  const [permissionsRole, setPermissionsRole] = React.useState<RoleDto | null>(null);
+  const [permissionsRole, setPermissionsRole] = React.useState<RoleDto | null>(
+    null,
+  );
   const [deletingRole, setDeletingRole] = React.useState<RoleDto | null>(null);
 
   const roles = rolesQuery.data ?? EMPTY_ROLES;
@@ -80,7 +93,10 @@ function RolesPageContent() {
     return counts;
   }, [roles, permissionCountQueries]);
 
-  const columns = React.useMemo(() => createRoleColumns(permissionCounts), [permissionCounts]);
+  const columns = React.useMemo(
+    () => createRoleColumns(locale, permissionCounts),
+    [locale, permissionCounts],
+  );
 
   async function handleConfirmDelete() {
     if (!deletingRole) return;
@@ -95,13 +111,16 @@ function RolesPageContent() {
   return (
     <>
       <PageHeader
-        title="Roles & Permissions"
-        description="Define roles and manage which permissions each one grants."
+        title={t("roles.title")}
+        description={t("roles.description")}
         actions={
           canCreate ? (
-            <Button onClick={() => setFormState({ open: true, role: null })} className="gap-1.5">
+            <Button
+              onClick={() => setFormState({ open: true, role: null })}
+              className="gap-1.5"
+            >
               <Plus className="size-4" />
-              Create role
+              {t("roles.createButton")}
             </Button>
           ) : undefined
         }
@@ -112,30 +131,33 @@ function RolesPageContent() {
         columns={columns}
         data={roles}
         isLoading={rolesQuery.isLoading}
-        searchPlaceholder="Search roles…"
-        totalLabel="Roles"
+        searchPlaceholder={t("roles.searchPlaceholder")}
+        totalLabel={t("roles.totalLabel")}
         getRowId={(row) => String(row.id)}
         renderRowActions={(role) => (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="size-8">
                 <MoreHorizontal className="size-4" />
-                <span className="sr-only">Row actions</span>
+                <span className="sr-only">{t("common.rowActions")}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setPermissionsRole(role)}>
-                <ShieldCheck /> Permissions
+                <ShieldCheck /> {t("roles.rowActions.permissions")}
               </DropdownMenuItem>
-              <DropdownMenuItem disabled={!canUpdate} onClick={() => setFormState({ open: true, role })}>
-                <Pencil /> Edit
+              <DropdownMenuItem
+                disabled={!canUpdate}
+                onClick={() => setFormState({ open: true, role })}
+              >
+                <Pencil /> {t("common.edit")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
                 disabled={!canDelete || role.is_system}
                 onClick={() => setDeletingRole(role)}
               >
-                <Trash2 /> Delete
+                <Trash2 /> {t("common.delete")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -154,25 +176,33 @@ function RolesPageContent() {
         onOpenChange={(open) => !open && setPermissionsRole(null)}
       />
 
-      <Dialog open={!!deletingRole} onOpenChange={(open) => !open && setDeletingRole(null)}>
+      <Dialog
+        open={!!deletingRole}
+        onOpenChange={(open) => !open && setDeletingRole(null)}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete role</DialogTitle>
+            <DialogTitle>{t("roles.delete.title")}</DialogTitle>
             <DialogDescription>
-              This permanently deletes the <span className="font-medium text-foreground">{deletingRole?.name}</span>{" "}
-              role. Users holding it will lose the permissions it granted.
+              {t("roles.delete.descriptionPrefix")}{" "}
+              <span className="font-medium text-foreground">
+                {deletingRole?.name}
+              </span>{" "}
+              {t("roles.delete.descriptionSuffix")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeletingRole(null)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               variant="destructive"
               disabled={deleteMutation.isPending}
               onClick={() => void handleConfirmDelete()}
             >
-              {deleteMutation.isPending ? "Deleting…" : "Delete"}
+              {deleteMutation.isPending
+                ? t("common.deleting")
+                : t("common.delete")}
             </Button>
           </DialogFooter>
         </DialogContent>

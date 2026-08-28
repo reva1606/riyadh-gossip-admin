@@ -1,9 +1,14 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 import { GuestGuard } from "@/components/layout/guest-guard";
 import { Logo } from "@/components/shared/logo";
+import { useTranslation } from "@/lib/i18n/language-provider";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
+
   return (
     <GuestGuard>
       <div className="grid min-h-screen lg:grid-cols-2">
@@ -21,16 +26,13 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
           <div className="relative z-10 max-w-md">
             <h1 className="text-3xl font-semibold tracking-tight text-balance">
-              Run the show from one dashboard.
+              {t("auth.heroTitle")}
             </h1>
-            <p className="mt-3 text-sm text-sidebar-muted-foreground">
-              Staff, events, tickets and bookings — everything the MBFshow team needs to
-              keep Riyadh&apos;s nightlife running, in one place.
-            </p>
+            <p className="mt-3 text-sm text-sidebar-muted-foreground">{t("auth.heroSubtitle")}</p>
           </div>
 
           <p className="relative z-10 text-xs text-sidebar-muted-foreground">
-            © {new Date().getFullYear()} MBFshow. All rights reserved.
+            {t("auth.copyright", { year: new Date().getFullYear() })}
           </p>
         </div>
 

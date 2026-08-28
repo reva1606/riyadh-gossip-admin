@@ -4,6 +4,7 @@ import * as React from "react";
 
 import { env } from "@/config/env";
 import { useBookingQuery } from "@/hooks/use-bookings";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
@@ -47,23 +48,29 @@ interface BookingDetailSheetProps {
  * shown in the list) so it always reflects the current booking/ticket state.
  */
 export function BookingDetailSheet({ bookingId, open, onOpenChange }: BookingDetailSheetProps) {
+  const { t } = useTranslation();
   const bookingQuery = useBookingQuery(bookingId);
   const booking = bookingQuery.data;
 
+  const STATUS_LABEL: Record<BookingStatus, string> = {
+    PAID: t("bookings.status.paid"),
+    PENDING_PAYMENT: t("bookings.status.pendingPayment"),
+    CANCELLED: t("bookings.status.cancelled"),
+    EXPIRED: t("bookings.status.expired"),
+  };
+
+  const title = booking ? t("bookings.detail.titleWithId", { id: booking.id }) : t("bookings.detail.title");
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="right"
-        title={booking ? `Booking #${booking.id}` : "Booking details"}
-        className="w-full gap-0 sm:max-w-lg"
-      >
+      <SheetContent side="right" title={title} className="w-full gap-0 sm:max-w-lg">
         <SheetHeader className="border-b border-border">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold">
-              {booking ? `Booking #${booking.id}` : "Booking details"}
-            </h2>
+            <h2 className="text-lg font-semibold">{title}</h2>
             {booking && (
-              <Badge variant={BOOKING_STATUS_BADGE_VARIANT[booking.status]}>{booking.status}</Badge>
+              <Badge variant={BOOKING_STATUS_BADGE_VARIANT[booking.status]}>
+                {STATUS_LABEL[booking.status]}
+              </Badge>
             )}
           </div>
           {booking && <p className="text-sm text-muted-foreground">{booking.event.title}</p>}
@@ -77,15 +84,15 @@ export function BookingDetailSheet({ bookingId, open, onOpenChange }: BookingDet
               <Skeleton className="h-5 w-1/2" />
             </div>
           ) : bookingQuery.isError ? (
-            <p className="pt-4 text-sm text-danger">Failed to load this booking. Please try again.</p>
+            <p className="pt-4 text-sm text-danger">{t("bookings.detail.loadError")}</p>
           ) : booking ? (
             <Tabs defaultValue="details" className="pt-4">
               <TabsList className="w-full">
                 <TabsTrigger value="details" className="flex-1">
-                  Details
+                  {t("bookings.detail.tabs.details")}
                 </TabsTrigger>
                 <TabsTrigger value="tickets" className="flex-1">
-                  Tickets ({booking.tickets.length})
+                  {t("bookings.detail.tabs.tickets", { count: booking.tickets.length })}
                 </TabsTrigger>
               </TabsList>
 
@@ -108,68 +115,81 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
   return (
     <div className="flex items-start justify-between gap-4 py-2">
       <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="text-right text-sm font-medium">{value}</span>
+      <span className="text-end text-sm font-medium">{value}</span>
     </div>
   );
 }
 
 function BookingDetailsPanel({ booking }: { booking: Booking }) {
+  const { t } = useTranslation();
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const qrUrl = booking.qr_code_url ? `${env.apiUrl}${booking.qr_code_url}` : null;
+
+  const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {
+    SUCCEEDED: t("bookings.paymentStatus.succeeded"),
+    PENDING: t("bookings.paymentStatus.pending"),
+    FAILED: t("bookings.paymentStatus.failed"),
+  };
 
   return (
     <div className="flex flex-col gap-6">
       <section>
-        <p className="mb-1 text-sm font-medium">Customer</p>
+        <p className="mb-1 text-sm font-medium">{t("bookings.detail.customer.title")}</p>
         <div className="rounded-lg border border-border p-3">
           <DetailRow
-            label="Name"
+            label={t("bookings.detail.customer.name")}
             value={`${booking.user.first_name} ${booking.user.last_name}`}
           />
-          <DetailRow label="Email" value={booking.user.email} />
+          <DetailRow label={t("bookings.detail.customer.email")} value={booking.user.email} />
         </div>
       </section>
 
       <section>
-        <p className="mb-1 text-sm font-medium">Event</p>
+        <p className="mb-1 text-sm font-medium">{t("bookings.detail.event.title")}</p>
         <div className="rounded-lg border border-border p-3">
-          <DetailRow label="Title" value={booking.event.title} />
-          <DetailRow label="Starts" value={dateFormatter.format(new Date(booking.event.start_date))} />
-          <DetailRow label="Location" value={booking.event.location} />
+          <DetailRow label={t("bookings.detail.event.titleLabel")} value={booking.event.title} />
+          <DetailRow
+            label={t("bookings.detail.event.starts")}
+            value={dateFormatter.format(new Date(booking.event.start_date))}
+          />
+          <DetailRow label={t("bookings.detail.event.location")} value={booking.event.location} />
         </div>
       </section>
 
       <section>
-        <p className="mb-1 text-sm font-medium">Payment</p>
+        <p className="mb-1 text-sm font-medium">{t("bookings.detail.payment.title")}</p>
         <div className="rounded-lg border border-border p-3">
           <DetailRow
-            label="Status"
+            label={t("bookings.detail.payment.status")}
             value={
               <Badge variant={PAYMENT_STATUS_BADGE_VARIANT[booking.payment.status]}>
-                {booking.payment.status}
+                {PAYMENT_STATUS_LABEL[booking.payment.status]}
               </Badge>
             }
           />
-          <DetailRow label="Method" value={booking.payment.method ?? "—"} />
+          <DetailRow label={t("bookings.detail.payment.method")} value={booking.payment.method ?? "—"} />
           <DetailRow
-            label="Paid at"
+            label={t("bookings.detail.payment.paidAt")}
             value={booking.payment.paid_at ? dateFormatter.format(new Date(booking.payment.paid_at)) : "—"}
           />
         </div>
       </section>
 
       <section>
-        <p className="mb-1 text-sm font-medium">Amounts</p>
+        <p className="mb-1 text-sm font-medium">{t("bookings.detail.amounts.title")}</p>
         <div className="rounded-lg border border-border p-3">
-          <DetailRow label="Subtotal" value={currencyFormatter.format(booking.subtotal)} />
-          <DetailRow label="Discount" value={currencyFormatter.format(booking.discount_amount)} />
-          <DetailRow label="Total" value={currencyFormatter.format(booking.total_amount)} />
-          <DetailRow label="Promo code" value={booking.promo_code_snapshot ?? "—"} />
+          <DetailRow label={t("bookings.detail.amounts.subtotal")} value={currencyFormatter.format(booking.subtotal)} />
+          <DetailRow
+            label={t("bookings.detail.amounts.discount")}
+            value={currencyFormatter.format(booking.discount_amount)}
+          />
+          <DetailRow label={t("bookings.detail.amounts.total")} value={currencyFormatter.format(booking.total_amount)} />
+          <DetailRow label={t("bookings.detail.amounts.promoCode")} value={booking.promo_code_snapshot ?? "—"} />
         </div>
       </section>
 
       <section>
-        <p className="mb-1 text-sm font-medium">Entry</p>
+        <p className="mb-1 text-sm font-medium">{t("bookings.detail.entry.title")}</p>
         <div className="flex items-center gap-3 rounded-lg border border-border p-3">
           {qrUrl ? (
             <button
@@ -178,21 +198,27 @@ function BookingDetailsPanel({ booking }: { booking: Booking }) {
               className="shrink-0 overflow-hidden rounded-md border border-border"
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- external, dynamic uploads URL */}
-              <img src={qrUrl} alt={`QR code for booking #${booking.id}`} className="size-14 object-cover" />
+              <img
+                src={qrUrl}
+                alt={t("bookings.detail.entry.qrAlt", { id: booking.id })}
+                className="size-14 object-cover"
+              />
             </button>
           ) : (
             <div className="flex size-14 shrink-0 items-center justify-center rounded-md border border-dashed border-border text-[10px] text-muted-foreground">
-              No QR
+              {t("bookings.detail.entry.noQr")}
             </div>
           )}
 
           <div className="flex flex-1 flex-col">
             <DetailRow
-              label="Checked in"
+              label={t("bookings.detail.entry.checkedInLabel")}
               value={
                 booking.checked_in_at
-                  ? `Checked in — ${dateFormatter.format(new Date(booking.checked_in_at))}`
-                  : "Not checked in yet"
+                  ? t("bookings.detail.entry.checkedIn", {
+                      date: dateFormatter.format(new Date(booking.checked_in_at)),
+                    })
+                  : t("bookings.detail.entry.notCheckedIn")
               }
             />
           </div>
@@ -201,22 +227,22 @@ function BookingDetailsPanel({ booking }: { booking: Booking }) {
         <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
           <DialogContent className="flex max-w-sm flex-col items-center gap-4">
             <VisuallyHidden asChild>
-              <DialogTitle>Booking QR code</DialogTitle>
+              <DialogTitle>{t("bookings.detail.entry.qrDialogTitle")}</DialogTitle>
             </VisuallyHidden>
             {qrUrl && (
               // eslint-disable-next-line @next/next/no-img-element -- external, dynamic uploads URL
-              <img src={qrUrl} alt="Booking QR code" className="w-full rounded-md" />
+              <img src={qrUrl} alt={t("bookings.detail.entry.qrPreviewAlt")} className="w-full rounded-md" />
             )}
           </DialogContent>
         </Dialog>
       </section>
 
       <section>
-        <p className="mb-1 text-sm font-medium">Timing</p>
+        <p className="mb-1 text-sm font-medium">{t("bookings.detail.timing.title")}</p>
         <div className="rounded-lg border border-border p-3">
-          <DetailRow label="Created" value={dateFormatter.format(new Date(booking.created_at))} />
-          <DetailRow label="Updated" value={dateFormatter.format(new Date(booking.updated_at))} />
-          <DetailRow label="Expires" value={dateFormatter.format(new Date(booking.expires_at))} />
+          <DetailRow label={t("bookings.detail.timing.created")} value={dateFormatter.format(new Date(booking.created_at))} />
+          <DetailRow label={t("bookings.detail.timing.updated")} value={dateFormatter.format(new Date(booking.updated_at))} />
+          <DetailRow label={t("bookings.detail.timing.expires")} value={dateFormatter.format(new Date(booking.expires_at))} />
         </div>
       </section>
     </div>
@@ -250,8 +276,10 @@ function groupTickets(tickets: Ticket[]): TicketGroup[] {
 }
 
 function BookingTicketsPanel({ tickets }: { tickets: Ticket[] }) {
+  const { t } = useTranslation();
+
   if (!tickets.length) {
-    return <p className="pt-4 text-sm text-muted-foreground">This booking has no tickets.</p>;
+    return <p className="pt-4 text-sm text-muted-foreground">{t("bookings.detail.tickets.empty")}</p>;
   }
 
   const groups = groupTickets(tickets);
@@ -265,7 +293,7 @@ function BookingTicketsPanel({ tickets }: { tickets: Ticket[] }) {
               {group.count}× {group.ticket_class_name}
             </span>
             <span className="text-sm text-muted-foreground">
-              {currencyFormatter.format(group.price)} each
+              {currencyFormatter.format(group.price)} {t("bookings.detail.tickets.each")}
             </span>
           </div>
           <span className="text-sm font-medium">{currencyFormatter.format(group.price * group.count)}</span>

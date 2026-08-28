@@ -9,6 +9,7 @@ import { useEventsQuery } from "@/hooks/use-events";
 import { useUsersQuery } from "@/hooks/use-users";
 import { useCreatePromoCodeMutation, useUpdatePromoCodeMutation } from "@/hooks/use-promo-codes";
 import { promoCodeFormSchema, type PromoCodeFormValues } from "@/lib/validations/promo-code.schema";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { DateTimePicker } from "@/components/shared/date-time-picker";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -70,6 +71,7 @@ function toEventOptions(promoCode: PromoCode | null | undefined): RestrictionOpt
 
 export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeFormSheetProps) {
   const isEdit = !!promoCode;
+  const { t } = useTranslation();
   const createMutation = useCreatePromoCodeMutation();
   const updateMutation = useUpdatePromoCodeMutation();
   const mutation = isEdit ? updateMutation : createMutation;
@@ -131,17 +133,18 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
     }
   }
 
+  const sheetTitle =
+    isEdit && promoCode
+      ? t("promoCodes.form.editTitle", { name: promoCode.name })
+      : t("promoCodes.form.createTitle");
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="right"
-        title={isEdit ? `Edit ${promoCode.name}` : "Create promo code"}
-        className="w-full gap-0 sm:max-w-2xl"
-      >
+      <SheetContent side="right" title={sheetTitle} className="w-full gap-0 sm:max-w-2xl">
         <SheetHeader className="border-b border-border">
-          <h2 className="text-lg font-semibold">{isEdit ? `Edit ${promoCode.name}` : "Create promo code"}</h2>
+          <h2 className="text-lg font-semibold">{sheetTitle}</h2>
           <p className="text-sm text-muted-foreground">
-            {isEdit ? "Update this promo code's details." : "Fill in the details for a new promo code."}
+            {isEdit ? t("promoCodes.form.editDescription") : t("promoCodes.form.createDescription")}
           </p>
         </SheetHeader>
 
@@ -154,9 +157,9 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>{t("promoCodes.form.nameLabel")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Summer Offer" {...field} />
+                        <Input placeholder={t("promoCodes.form.namePlaceholder")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -168,9 +171,9 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
                   name="code"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Code</FormLabel>
+                      <FormLabel>{t("promoCodes.form.codeLabel")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. SUMMER20" className="uppercase" {...field} />
+                        <Input placeholder={t("promoCodes.form.codePlaceholder")} className="uppercase" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -183,9 +186,9 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t("promoCodes.form.descriptionLabel")}</FormLabel>
                     <FormControl>
-                      <Textarea rows={3} placeholder="What's this promo code for?" {...field} />
+                      <Textarea rows={3} placeholder={t("promoCodes.form.descriptionPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -198,16 +201,16 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
                   name="type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Discount type</FormLabel>
+                      <FormLabel>{t("promoCodes.form.typeLabel")}</FormLabel>
                       <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a type" />
+                            <SelectValue placeholder={t("promoCodes.form.typePlaceholder")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="PERCENTAGE">Percentage</SelectItem>
-                          <SelectItem value="FIXED">Fixed amount</SelectItem>
+                          <SelectItem value="PERCENTAGE">{t("promoCodes.form.typePercentage")}</SelectItem>
+                          <SelectItem value="FIXED">{t("promoCodes.form.typeFixed")}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -220,9 +223,13 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
                   name="value"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Discount value{typeValue === "PERCENTAGE" ? " (%)" : ""}</FormLabel>
+                      <FormLabel>
+                        {typeValue === "PERCENTAGE"
+                          ? t("promoCodes.form.valueLabelPercentage")
+                          : t("promoCodes.form.valueLabel")}
+                      </FormLabel>
                       <FormControl>
-                        <Input type="number" step="any" min={0} placeholder="e.g. 20" {...field} />
+                        <Input type="number" step="any" min={0} placeholder={t("promoCodes.form.valuePlaceholder")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -235,14 +242,11 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
                 name="max_uses"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Max total uses</FormLabel>
+                    <FormLabel>{t("promoCodes.form.maxUsesLabel")}</FormLabel>
                     <FormControl>
-                      <Input type="number" step={1} min={1} placeholder="Unlimited" {...field} />
+                      <Input type="number" step={1} min={1} placeholder={t("promoCodes.form.maxUsesPlaceholder")} {...field} />
                     </FormControl>
-                    <p className="text-xs text-muted-foreground">
-                      How many times this code can be redeemed in total, across all users combined. Leave blank for
-                      unlimited.
-                    </p>
+                    <p className="text-xs text-muted-foreground">{t("promoCodes.form.maxUsesHelp")}</p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -255,19 +259,23 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between">
-                        <FormLabel>Valid from</FormLabel>
+                        <FormLabel>{t("promoCodes.form.validFromLabel")}</FormLabel>
                         {field.value && (
                           <button
                             type="button"
                             onClick={() => field.onChange("")}
                             className="text-xs text-muted-foreground hover:text-foreground"
                           >
-                            Clear
+                            {t("common.clear")}
                           </button>
                         )}
                       </div>
                       <FormControl>
-                        <DateTimePicker value={field.value ?? ""} onChange={field.onChange} placeholder="No start restriction" />
+                        <DateTimePicker
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          placeholder={t("promoCodes.form.validFromPlaceholder")}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -280,19 +288,23 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between">
-                        <FormLabel>Valid until</FormLabel>
+                        <FormLabel>{t("promoCodes.form.validUntilLabel")}</FormLabel>
                         {field.value && (
                           <button
                             type="button"
                             onClick={() => field.onChange("")}
                             className="text-xs text-muted-foreground hover:text-foreground"
                           >
-                            Clear
+                            {t("common.clear")}
                           </button>
                         )}
                       </div>
                       <FormControl>
-                        <DateTimePicker value={field.value ?? ""} onChange={field.onChange} placeholder="No end restriction" />
+                        <DateTimePicker
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          placeholder={t("promoCodes.form.validUntilPlaceholder")}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -301,10 +313,8 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
               </div>
 
               <div>
-                <Label>Restrict to users</Label>
-                <p className="mb-2 text-xs text-muted-foreground">
-                  Leave empty to make this promo code applicable to all users.
-                </p>
+                <Label>{t("promoCodes.form.restrictUsersLabel")}</Label>
+                <p className="mb-2 text-xs text-muted-foreground">{t("promoCodes.form.restrictUsersHelp")}</p>
                 <RestrictionMultiSelect
                   selectedOptions={selectedUsers}
                   onChange={setSelectedUsers}
@@ -312,17 +322,15 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
                   onSearchChange={setUserSearch}
                   options={userOptions}
                   isLoading={usersQuery.isLoading}
-                  placeholder="All users"
-                  searchPlaceholder="Search users by name or email…"
-                  emptyLabel="No users found."
+                  placeholder={t("promoCodes.form.restrictUsersPlaceholder")}
+                  searchPlaceholder={t("promoCodes.form.restrictUsersSearchPlaceholder")}
+                  emptyLabel={t("promoCodes.form.restrictUsersEmpty")}
                 />
               </div>
 
               <div>
-                <Label>Restrict to events</Label>
-                <p className="mb-2 text-xs text-muted-foreground">
-                  Leave empty to make this promo code applicable to all events.
-                </p>
+                <Label>{t("promoCodes.form.restrictEventsLabel")}</Label>
+                <p className="mb-2 text-xs text-muted-foreground">{t("promoCodes.form.restrictEventsHelp")}</p>
                 <RestrictionMultiSelect
                   selectedOptions={selectedEvents}
                   onChange={setSelectedEvents}
@@ -330,9 +338,9 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
                   onSearchChange={setEventSearch}
                   options={eventOptions}
                   isLoading={eventsQuery.isLoading}
-                  placeholder="All events"
-                  searchPlaceholder="Search events by title…"
-                  emptyLabel="No events found."
+                  placeholder={t("promoCodes.form.restrictEventsPlaceholder")}
+                  searchPlaceholder={t("promoCodes.form.restrictEventsSearchPlaceholder")}
+                  emptyLabel={t("promoCodes.form.restrictEventsEmpty")}
                 />
               </div>
 
@@ -343,8 +351,8 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
                   <FormItem>
                     <div className="flex items-center justify-between rounded-lg border border-border px-3 py-2.5">
                       <div>
-                        <FormLabel className="text-sm">Active</FormLabel>
-                        <p className="text-xs text-muted-foreground">Inactive promo codes cannot be applied.</p>
+                        <FormLabel className="text-sm">{t("common.active")}</FormLabel>
+                        <p className="text-xs text-muted-foreground">{t("promoCodes.form.activeHelp")}</p>
                       </div>
                       <FormControl>
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -356,7 +364,11 @@ export function PromoCodeFormSheet({ open, onOpenChange, promoCode }: PromoCodeF
               />
 
               <Button type="submit" disabled={mutation.isPending} className="mt-2 self-start">
-                {mutation.isPending ? "Saving…" : isEdit ? "Save changes" : "Create promo code"}
+                {mutation.isPending
+                  ? t("common.saving")
+                  : isEdit
+                    ? t("promoCodes.form.saveChanges")
+                    : t("promoCodes.createButton")}
               </Button>
             </form>
           </Form>

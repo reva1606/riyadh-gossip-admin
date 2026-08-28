@@ -4,6 +4,7 @@ import { Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { useHasMounted } from "@/hooks/use-has-mounted";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,11 +16,12 @@ import {
 export function ThemeToggle() {
   const { setTheme } = useTheme();
   const mounted = useHasMounted();
+  const { t } = useTranslation();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Toggle theme">
+        <Button variant="ghost" size="icon" aria-label={t("common.toggleTheme")}>
           {mounted ? (
             <>
               <Sun className="size-4.5 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
@@ -32,13 +34,13 @@ export function ThemeToggle() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun /> Light
+          <Sun /> {t("common.light")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon /> Dark
+          <Moon /> {t("common.dark")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
-          <Laptop /> System
+          <Laptop /> {t("common.system")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

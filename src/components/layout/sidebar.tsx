@@ -5,6 +5,7 @@ import { ChevronsLeft, ChevronsRight, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/store/auth-context";
 import { useSidebar } from "@/store/sidebar-context";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Logo } from "@/components/shared/logo";
 import { NavList } from "@/components/layout/nav-list";
 import { Button } from "@/components/ui/button";
@@ -18,11 +19,12 @@ import {
 export function Sidebar() {
   const { isCollapsed, toggleCollapsed } = useSidebar();
   const { logout } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <aside
       className={cn(
-        "glass-sidebar fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-sidebar-border transition-[width] duration-200 lg:flex",
+        "glass-sidebar fixed inset-y-0 inset-s-0 z-30 hidden flex-col border-e border-sidebar-border transition-[width] duration-200 lg:flex",
         isCollapsed ? "w-[76px]" : "w-64",
       )}
     >
@@ -47,7 +49,7 @@ export function Sidebar() {
                 <LogOut className="size-4.5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="right">Logout</TooltipContent>
+            <TooltipContent side="right">{t("common.logout")}</TooltipContent>
           </Tooltip>
         ) : (
           <Button
@@ -56,7 +58,7 @@ export function Sidebar() {
             className="justify-start gap-3 px-3 text-sidebar-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
           >
             <LogOut className="size-4.5" />
-            Logout
+            {t("common.logout")}
           </Button>
         )}
 
@@ -68,12 +70,12 @@ export function Sidebar() {
             "text-sidebar-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground",
             isCollapsed ? "" : "self-end",
           )}
-          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={isCollapsed ? t("common.expandSidebar") : t("common.collapseSidebar")}
         >
           {isCollapsed ? (
-            <ChevronsRight className="size-4.5" />
+            <ChevronsRight className="size-4.5 rtl:-scale-x-100" />
           ) : (
-            <ChevronsLeft className="size-4.5" />
+            <ChevronsLeft className="size-4.5 rtl:-scale-x-100" />
           )}
         </Button>
       </div>

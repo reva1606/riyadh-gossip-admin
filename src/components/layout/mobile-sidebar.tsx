@@ -4,6 +4,7 @@ import { LogOut } from "lucide-react";
 
 import { useAuth } from "@/store/auth-context";
 import { useSidebar } from "@/store/sidebar-context";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Logo } from "@/components/shared/logo";
 import { NavList } from "@/components/layout/nav-list";
 import { Button } from "@/components/ui/button";
@@ -13,12 +14,13 @@ import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
 export function MobileSidebar() {
   const { isMobileOpen, setMobileOpen } = useSidebar();
   const { logout } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <Sheet open={isMobileOpen} onOpenChange={setMobileOpen}>
       <SheetContent
         side="left"
-        title="Navigation"
+        title={t("common.navigation")}
         className="glass-sidebar w-72 gap-0 border-sidebar-border p-0 text-sidebar-foreground"
       >
         <SheetHeader className="h-16 flex-row items-center border-b border-sidebar-border">
@@ -36,7 +38,7 @@ export function MobileSidebar() {
             className="w-full justify-start gap-3 px-3 text-sidebar-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
           >
             <LogOut className="size-4.5" />
-            Logout
+            {t("common.logout")}
           </Button>
         </div>
       </SheetContent>

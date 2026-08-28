@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 
 import { useCreateCategoryMutation, useUpdateCategoryMutation } from "@/hooks/use-categories";
 import { categoryFormSchema, type CategoryFormValues } from "@/lib/validations/category.schema";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,6 +30,7 @@ interface CategoryFormDialogProps {
 
 export function CategoryFormDialog({ open, onOpenChange, category }: CategoryFormDialogProps) {
   const isEdit = !!category;
+  const { t } = useTranslation();
   const createMutation = useCreateCategoryMutation();
   const updateMutation = useUpdateCategoryMutation();
   const mutation = isEdit ? updateMutation : createMutation;
@@ -57,9 +59,9 @@ export function CategoryFormDialog({ open, onOpenChange, category }: CategoryFor
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit category" : "Create category"}</DialogTitle>
+          <DialogTitle>{isEdit ? t("categories.form.editTitle") : t("categories.form.createTitle")}</DialogTitle>
           <DialogDescription>
-            {isEdit ? "Update this category's name and description." : "Define a new event category."}
+            {isEdit ? t("categories.form.editDescription") : t("categories.form.createDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -70,9 +72,9 @@ export function CategoryFormDialog({ open, onOpenChange, category }: CategoryFor
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>{t("categories.form.nameLabel")}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Music" {...field} />
+                    <Input placeholder={t("categories.form.namePlaceholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -83,9 +85,9 @@ export function CategoryFormDialog({ open, onOpenChange, category }: CategoryFor
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t("categories.form.descriptionLabel")}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Optional" {...field} />
+                    <Textarea placeholder={t("categories.form.descriptionPlaceholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -94,10 +96,14 @@ export function CategoryFormDialog({ open, onOpenChange, category }: CategoryFor
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? "Saving…" : isEdit ? "Save changes" : "Create category"}
+                {mutation.isPending
+                  ? t("common.saving")
+                  : isEdit
+                    ? t("categories.form.saveChanges")
+                    : t("categories.createButton")}
               </Button>
             </DialogFooter>
           </form>

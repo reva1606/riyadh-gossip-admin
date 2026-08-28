@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { useTranslation } from "@/lib/i18n/language-provider";
 
 export interface DataTableFilterOption {
   label: string;
@@ -37,12 +38,13 @@ interface DataTableToolbarProps {
 export function DataTableToolbar({
   searchValue,
   onSearchChange,
-  searchPlaceholder = "Search…",
+  searchPlaceholder,
   filters,
   getFilterValue,
   setFilterValue,
   actions,
 }: DataTableToolbarProps) {
+  const { t } = useTranslation();
   const [localSearch, setLocalSearch] = React.useState(searchValue);
   const debouncedSearch = useDebouncedValue(localSearch, 300);
 
@@ -74,12 +76,12 @@ export function DataTableToolbar({
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-1 flex-wrap items-center gap-2">
         <div className="relative w-full sm:w-64">
-          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="pointer-events-none absolute top-1/2 inset-s-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={localSearch}
             onChange={(event) => setLocalSearch(event.target.value)}
-            placeholder={searchPlaceholder}
-            className="pl-8"
+            placeholder={searchPlaceholder ?? t("common.searchPlaceholder")}
+            className="ps-8"
           />
         </div>
 
@@ -93,7 +95,9 @@ export function DataTableToolbar({
               <SelectValue placeholder={filter.placeholder ?? filter.label} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ALL_VALUE}>All {filter.label.toLowerCase()}</SelectItem>
+              <SelectItem value={ALL_VALUE}>
+                {t("common.all")} {filter.label}
+              </SelectItem>
               {filter.options.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -106,7 +110,7 @@ export function DataTableToolbar({
         {hasActiveState && (
           <Button type="button" variant="ghost" size="sm" onClick={clearAll} className="gap-1.5 text-muted-foreground">
             <X className="size-3.5" />
-            Clear
+            {t("common.clear")}
           </Button>
         )}
       </div>

@@ -24,9 +24,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/store/auth-context";
 import { useDeleteEventMutation, useEventsQuery } from "@/hooks/use-events";
+import { useTranslation } from "@/lib/i18n/language-provider";
 import type { Event, EventsListParams } from "@/types/event.types";
 
-import { eventColumns } from "./columns";
+import { getEventColumns } from "./columns";
 import { EventFormSheet } from "./event-form-sheet";
 
 const SORTABLE_COLUMN_IDS = new Set(["title", "start_date", "created_at"]);
@@ -44,6 +45,8 @@ function EventsPageContent() {
   const canCreate = hasPermission("event.create");
   const canUpdate = hasPermission("event.update");
   const canDelete = hasPermission("event.delete");
+  const { t, locale } = useTranslation();
+  const eventColumns = React.useMemo(() => getEventColumns(locale), [locale]);
 
   const [pagination, setPagination] = React.useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -93,8 +96,8 @@ function EventsPageContent() {
   return (
     <>
       <PageHeader
-        title="Events"
-        description="Create and manage events, their ticket classes and images."
+        title={t("events.title")}
+        description={t("events.description")}
         actions={
           canCreate ? (
             <Button
@@ -102,7 +105,7 @@ function EventsPageContent() {
               className="gap-1.5"
             >
               <Plus className="size-4" />
-              Create event
+              {t("events.createButton")}
             </Button>
           ) : undefined
         }
@@ -121,15 +124,15 @@ function EventsPageContent() {
         onSortingChange={setSorting}
         search={search}
         onSearchChange={handleSearchChange}
-        searchPlaceholder="Search by title or location…"
+        searchPlaceholder={t("events.searchPlaceholder")}
         getRowId={(row) => String(row.id)}
-        totalLabel="Events"
+        totalLabel={t("events.totalLabel")}
         renderRowActions={(event) => (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="size-8">
                 <MoreHorizontal className="size-4" />
-                <span className="sr-only">Row actions</span>
+                <span className="sr-only">{t("common.rowActions")}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -139,10 +142,10 @@ function EventsPageContent() {
                   setFormState((prev) => ({ open: true, event, formKey: prev.formKey + 1 }))
                 }
               >
-                <Pencil /> Edit
+                <Pencil /> {t("common.edit")}
               </DropdownMenuItem>
               <DropdownMenuItem variant="destructive" disabled={!canDelete} onClick={() => setDeletingEvent(event)}>
-                <Trash2 /> Delete
+                <Trash2 /> {t("common.delete")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -159,23 +162,23 @@ function EventsPageContent() {
       <Dialog open={!!deletingEvent} onOpenChange={(open) => !open && setDeletingEvent(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete event</DialogTitle>
+            <DialogTitle>{t("events.delete.title")}</DialogTitle>
             <DialogDescription>
-              This permanently deletes{" "}
-              <span className="font-medium text-foreground">{deletingEvent?.title}</span>, along with its ticket
-              classes and images. This action cannot be undone.
+              {t("events.delete.descriptionPrefix")}{" "}
+              <span className="font-medium text-foreground">{deletingEvent?.title}</span>{" "}
+              {t("events.delete.descriptionSuffix")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeletingEvent(null)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               variant="destructive"
               disabled={deleteMutation.isPending}
               onClick={() => void handleConfirmDelete()}
             >
-              {deleteMutation.isPending ? "Deleting…" : "Delete"}
+              {deleteMutation.isPending ? t("common.deleting") : t("common.delete")}
             </Button>
           </DialogFooter>
         </DialogContent>
