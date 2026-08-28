@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -8,9 +10,14 @@ interface LogoProps {
 export function Logo({ collapsed = false, className }: LogoProps) {
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-[#8e7cff] text-sm font-extrabold text-primary-foreground shadow-lg shadow-primary/30">
-        RG
-      </div>
+      <Image
+        src="/logo.png"
+        alt="MBFshow"
+        width={36}
+        height={36}
+        priority
+        className="size-9 shrink-0 rounded-lg shadow-lg shadow-primary/30"
+      />
       {!collapsed && (
         <span className="text-base font-semibold tracking-tight text-sidebar-foreground">
           MBFshow
