@@ -4,6 +4,12 @@ export const bookings = {
   searchPlaceholder: "بحث باسم العميل أو البريد الإلكتروني أو الفعالية…",
   totalLabel: "الحجوزات",
   viewBooking: "عرض الحجز",
+  downloadInvoice: "تنزيل الفاتورة",
+
+  invoiceLocale: {
+    english: "الإنجليزية",
+    arabic: "العربية",
+  },
 
   filters: {
     statusLabel: "الحالة",
@@ -60,6 +66,10 @@ export const bookings = {
       status: "الحالة",
       method: "طريقة الدفع",
       paidAt: "تاريخ الدفع",
+    },
+
+    invoice: {
+      download: "تنزيل الفاتورة",
     },
 
     amounts: {

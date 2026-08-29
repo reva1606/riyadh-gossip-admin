@@ -4,6 +4,12 @@ export const bookings = {
   searchPlaceholder: "Search by customer name, email or event…",
   totalLabel: "Bookings",
   viewBooking: "View booking",
+  downloadInvoice: "Download invoice",
+
+  invoiceLocale: {
+    english: "English",
+    arabic: "Arabic",
+  },
 
   filters: {
     statusLabel: "Status",
@@ -60,6 +66,10 @@ export const bookings = {
       status: "Status",
       method: "Method",
       paidAt: "Paid at",
+    },
+
+    invoice: {
+      download: "Download invoice",
     },
 
     amounts: {

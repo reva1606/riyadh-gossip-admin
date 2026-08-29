@@ -51,6 +51,7 @@ export const CORE_ENDPOINTS = {
   bookings: {
     list: "/bookings",
     detail: (id: number | string) => `/bookings/${id}`,
+    invoice: (id: number | string) => `/bookings/${id}/invoice`,
   },
   promoCodes: {
     list: "/promo-codes",

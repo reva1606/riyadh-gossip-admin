@@ -2,14 +2,20 @@
 
 import * as React from "react";
 import type { PaginationState, SortingState } from "@tanstack/react-table";
-import { Eye } from "lucide-react";
+import { Download, Eye, Loader2 } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { PermissionGuard } from "@/components/layout/permission-guard";
 import { DataTable } from "@/components/data-table/data-table";
 import type { DataTableFilterConfig } from "@/components/data-table/data-table-toolbar";
 import { Button } from "@/components/ui/button";
-import { useBookingsQuery } from "@/hooks/use-bookings";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useBookingsQuery, useDownloadInvoiceMutation } from "@/hooks/use-bookings";
 import { useTranslation } from "@/lib/i18n/language-provider";
 import type { Booking, BookingsListParams } from "@/types/booking.types";
 
@@ -62,6 +68,7 @@ function BookingsPageContent() {
 
   const bookingsQuery = useBookingsQuery(params);
   const bookings = bookingsQuery.data?.data ?? [];
+  const downloadInvoice = useDownloadInvoiceMutation();
 
   function handleFilterChange(filterId: string, value: string) {
     if (filterId === "status") {
@@ -102,12 +109,35 @@ function BookingsPageContent() {
         filters={[STATUS_FILTER]}
         getRowId={(row) => String(row.id)}
         totalLabel={t("bookings.totalLabel")}
-        renderRowActions={(booking) => (
-          <Button variant="ghost" size="icon" className="size-8" onClick={() => handleViewBooking(booking)}>
-            <Eye className="size-4" />
-            <span className="sr-only">{t("bookings.viewBooking")}</span>
-          </Button>
-        )}
+        renderRowActions={(booking) => {
+          const isDownloading = downloadInvoice.isPending && downloadInvoice.variables?.id === booking.id;
+          return (
+            <>
+              <Button variant="ghost" size="icon" className="size-8" onClick={() => handleViewBooking(booking)}>
+                <Eye className="size-4" />
+                <span className="sr-only">{t("bookings.viewBooking")}</span>
+              </Button>
+              {booking.status === "PAID" && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="size-8" disabled={isDownloading}>
+                      {isDownloading ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+                      <span className="sr-only">{t("bookings.downloadInvoice")}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => downloadInvoice.mutate({ id: booking.id, locale: "en" })}>
+                      {t("bookings.invoiceLocale.english")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => downloadInvoice.mutate({ id: booking.id, locale: "ar" })}>
+                      {t("bookings.invoiceLocale.arabic")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </>
+          );
+        }}
       />
 
       <BookingDetailSheet

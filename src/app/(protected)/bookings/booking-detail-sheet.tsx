@@ -1,12 +1,20 @@
 "use client";
 
 import * as React from "react";
+import { Download, Loader2 } from "lucide-react";
 
 import { env } from "@/config/env";
-import { useBookingQuery } from "@/hooks/use-bookings";
+import { useBookingQuery, useDownloadInvoiceMutation } from "@/hooks/use-bookings";
 import { useTranslation } from "@/lib/i18n/language-provider";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -65,13 +73,16 @@ export function BookingDetailSheet({ bookingId, open, onOpenChange }: BookingDet
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" title={title} className="w-full gap-0 sm:max-w-lg">
         <SheetHeader className="border-b border-border">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold">{title}</h2>
-            {booking && (
-              <Badge variant={BOOKING_STATUS_BADGE_VARIANT[booking.status]}>
-                {STATUS_LABEL[booking.status]}
-              </Badge>
-            )}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold">{title}</h2>
+              {booking && (
+                <Badge variant={BOOKING_STATUS_BADGE_VARIANT[booking.status]}>
+                  {STATUS_LABEL[booking.status]}
+                </Badge>
+              )}
+            </div>
+            {booking && booking.status === "PAID" && <DownloadInvoiceButton bookingId={booking.id} />}
           </div>
           {booking && <p className="text-sm text-muted-foreground">{booking.event.title}</p>}
         </SheetHeader>
@@ -108,6 +119,34 @@ export function BookingDetailSheet({ bookingId, open, onOpenChange }: BookingDet
         </div>
       </SheetContent>
     </Sheet>
+  );
+}
+
+function DownloadInvoiceButton({ bookingId }: { bookingId: number }) {
+  const { t } = useTranslation();
+  const downloadInvoice = useDownloadInvoiceMutation();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" disabled={downloadInvoice.isPending}>
+          {downloadInvoice.isPending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Download className="size-4" />
+          )}
+          {t("bookings.detail.invoice.download")}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => downloadInvoice.mutate({ id: bookingId, locale: "en" })}>
+          {t("bookings.invoiceLocale.english")}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => downloadInvoice.mutate({ id: bookingId, locale: "ar" })}>
+          {t("bookings.invoiceLocale.arabic")}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
