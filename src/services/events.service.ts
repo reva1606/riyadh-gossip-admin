@@ -2,6 +2,7 @@ import { CORE_ENDPOINTS } from "@/lib/api/endpoints";
 import { coreApiClient } from "@/lib/api/client";
 import type { ApiResponse, PaginatedResponse } from "@/types/api.types";
 import type {
+  CancelEventResult,
   CreateEventPayload,
   Event,
   EventsListParams,
@@ -29,4 +30,9 @@ export const eventsService = {
 
   remove: (id: number) =>
     coreApiClient.delete<ApiResponse<null>>(CORE_ENDPOINTS.events.detail(id)),
+
+  cancel: (id: number) =>
+    coreApiClient
+      .post<ApiResponse<CancelEventResult>>(CORE_ENDPOINTS.events.cancel(id))
+      .then((res) => res.data),
 };

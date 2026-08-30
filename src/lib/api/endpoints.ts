@@ -47,6 +47,7 @@ export const CORE_ENDPOINTS = {
   events: {
     list: "/events",
     detail: (id: number | string) => `/events/${id}`,
+    cancel: (id: number | string) => `/events/${id}/cancel`,
   },
   bookings: {
     list: "/bookings",

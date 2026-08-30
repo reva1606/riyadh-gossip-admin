@@ -11,6 +11,12 @@ export const events = {
     starts: "Starts",
     location: "Location",
     ticketClasses: "Ticket classes",
+    status: "Status",
+  },
+
+  status: {
+    scheduled: "Scheduled",
+    cancelled: "Cancelled",
   },
 
   form: {
@@ -61,5 +67,16 @@ export const events = {
     title: "Delete event",
     descriptionPrefix: "This permanently deletes the",
     descriptionSuffix: "event, along with its ticket classes and images. This action cannot be undone.",
+  },
+
+  cancelAction: "Cancel event",
+  cancel: {
+    title: "Cancel event",
+    descriptionPrefix: "This cancels",
+    descriptionSuffix:
+      "and refunds every paid booking (excluding VAT) back to the customer. This action cannot be undone.",
+    confirmButton: "Cancel event",
+    cancelling: "Cancelling…",
+    alreadyStarted: "This event has already started and can no longer be cancelled.",
   },
 } as const;

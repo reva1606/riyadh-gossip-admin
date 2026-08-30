@@ -61,3 +61,21 @@ export function useDeleteEventMutation() {
     onError: (error) => toast.error(toApiError(error).message),
   });
 }
+
+export function useCancelEventMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => eventsService.cancel(id),
+    onSuccess: (result) => {
+      toast.success(
+        result.refunded_bookings_count > 0
+          ? `Event cancelled. ${result.refunded_bookings_count} booking(s) refunded (${result.total_refund_amount.toFixed(2)} SAR).`
+          : "Event cancelled.",
+      );
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.events });
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.bookings });
+    },
+    onError: (error) => toast.error(toApiError(error).message),
+  });
+}

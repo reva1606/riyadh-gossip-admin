@@ -14,9 +14,19 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
   timeStyle: "short",
 });
 
+const STATUS_BADGE_VARIANT = {
+  SCHEDULED: "success",
+  CANCELLED: "danger",
+} as const;
+
 /** Column defs are built once per locale (outside React) — `useTranslation` isn't available here. */
 export function getEventColumns(locale: Locale) {
   const t = dictionaries[locale].events.table;
+  const statusLabels = dictionaries[locale].events.status;
+  const STATUS_LABEL = {
+    SCHEDULED: statusLabels.scheduled,
+    CANCELLED: statusLabels.cancelled,
+  } as const;
 
   return columnHelper.columns([
     columnHelper.accessor("title", {
@@ -42,6 +52,14 @@ export function getEventColumns(locale: Locale) {
       id: "ticket_classes",
       header: t.ticketClasses,
       cell: ({ row }) => <span className="text-muted-foreground">{row.original.ticket_classes.length}</span>,
+      enableSorting: false,
+    }),
+    columnHelper.accessor("status", {
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t.status} />,
+      cell: ({ getValue }) => {
+        const status = getValue();
+        return <Badge variant={STATUS_BADGE_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>;
+      },
       enableSorting: false,
     }),
   ]);

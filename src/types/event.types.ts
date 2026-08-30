@@ -1,5 +1,7 @@
 import type { Category } from "./category.types";
 
+export type EventStatus = "SCHEDULED" | "CANCELLED";
+
 /** Mirrors the core app's `EventTicketClass` entity as returned nested on an event. */
 export interface TicketClass {
   id: number;
@@ -35,8 +37,18 @@ export interface Event {
   how_to_get_there: string;
   ticket_classes: TicketClass[];
   images: EventImage[];
+  status: EventStatus;
+  cancelled_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/** Mirrors the core app's `CancelEventResultDto` (POST /events/:id/cancel). */
+export interface CancelEventResult {
+  event: Event;
+  cancelled_bookings_count: number;
+  refunded_bookings_count: number;
+  total_refund_amount: number;
 }
 
 /** `id` present means "update this existing ticket class", absent means "insert new". */

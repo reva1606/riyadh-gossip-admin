@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import type { PaginationState, SortingState } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { Ban, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { PermissionGuard } from "@/components/layout/permission-guard";
@@ -23,7 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/store/auth-context";
-import { useDeleteEventMutation, useEventsQuery } from "@/hooks/use-events";
+import { useCancelEventMutation, useDeleteEventMutation, useEventsQuery } from "@/hooks/use-events";
 import { useTranslation } from "@/lib/i18n/language-provider";
 import type { Event, EventsListParams } from "@/types/event.types";
 
@@ -45,6 +45,7 @@ function EventsPageContent() {
   const canCreate = hasPermission("event.create");
   const canUpdate = hasPermission("event.update");
   const canDelete = hasPermission("event.delete");
+  const canCancel = hasPermission("event.cancel");
   const { t, locale } = useTranslation();
   const eventColumns = React.useMemo(() => getEventColumns(locale), [locale]);
 
@@ -63,6 +64,7 @@ function EventsPageContent() {
     formKey: 0,
   });
   const [deletingEvent, setDeletingEvent] = React.useState<Event | null>(null);
+  const [cancellingEvent, setCancellingEvent] = React.useState<Event | null>(null);
 
   const sort = sorting[0];
   const params: EventsListParams = {
@@ -75,6 +77,7 @@ function EventsPageContent() {
 
   const eventsQuery = useEventsQuery(params);
   const deleteMutation = useDeleteEventMutation();
+  const cancelMutation = useCancelEventMutation();
 
   const events = eventsQuery.data?.data ?? [];
 
@@ -88,6 +91,16 @@ function EventsPageContent() {
     try {
       await deleteMutation.mutateAsync(deletingEvent.id);
       setDeletingEvent(null);
+    } catch {
+      // Error toast already surfaced by the mutation's onError.
+    }
+  }
+
+  async function handleConfirmCancel() {
+    if (!cancellingEvent) return;
+    try {
+      await cancelMutation.mutateAsync(cancellingEvent.id);
+      setCancellingEvent(null);
     } catch {
       // Error toast already surfaced by the mutation's onError.
     }
@@ -127,29 +140,43 @@ function EventsPageContent() {
         searchPlaceholder={t("events.searchPlaceholder")}
         getRowId={(row) => String(row.id)}
         totalLabel={t("events.totalLabel")}
-        renderRowActions={(event) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="size-8">
-                <MoreHorizontal className="size-4" />
-                <span className="sr-only">{t("common.rowActions")}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                disabled={!canUpdate}
-                onClick={() =>
-                  setFormState((prev) => ({ open: true, event, formKey: prev.formKey + 1 }))
-                }
-              >
-                <Pencil /> {t("common.edit")}
-              </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive" disabled={!canDelete} onClick={() => setDeletingEvent(event)}>
-                <Trash2 /> {t("common.delete")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        renderRowActions={(event) => {
+          const isCancelled = event.status === "CANCELLED";
+          // Uses the query's own fetch timestamp rather than Date.now() so this
+          // stays a pure render computation — good enough for a UI-only gate
+          // since the backend re-validates start_date authoritatively anyway.
+          const hasStarted = new Date(event.start_date).getTime() <= eventsQuery.dataUpdatedAt;
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="size-8">
+                  <MoreHorizontal className="size-4" />
+                  <span className="sr-only">{t("common.rowActions")}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  disabled={!canUpdate}
+                  onClick={() =>
+                    setFormState((prev) => ({ open: true, event, formKey: prev.formKey + 1 }))
+                  }
+                >
+                  <Pencil /> {t("common.edit")}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  disabled={!canCancel || isCancelled || hasStarted}
+                  onClick={() => setCancellingEvent(event)}
+                >
+                  <Ban /> {t("events.cancelAction")}
+                </DropdownMenuItem>
+                <DropdownMenuItem variant="destructive" disabled={!canDelete} onClick={() => setDeletingEvent(event)}>
+                  <Trash2 /> {t("common.delete")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        }}
       />
 
       <EventFormSheet
@@ -179,6 +206,31 @@ function EventsPageContent() {
               onClick={() => void handleConfirmDelete()}
             >
               {deleteMutation.isPending ? t("common.deleting") : t("common.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!cancellingEvent} onOpenChange={(open) => !open && setCancellingEvent(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("events.cancel.title")}</DialogTitle>
+            <DialogDescription>
+              {t("events.cancel.descriptionPrefix")}{" "}
+              <span className="font-medium text-foreground">{cancellingEvent?.title}</span>{" "}
+              {t("events.cancel.descriptionSuffix")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCancellingEvent(null)}>
+              {t("common.cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={cancelMutation.isPending}
+              onClick={() => void handleConfirmCancel()}
+            >
+              {cancelMutation.isPending ? t("events.cancel.cancelling") : t("events.cancel.confirmButton")}
             </Button>
           </DialogFooter>
         </DialogContent>

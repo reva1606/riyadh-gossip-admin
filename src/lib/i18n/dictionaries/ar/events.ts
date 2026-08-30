@@ -11,6 +11,12 @@ export const events = {
     starts: "تبدأ في",
     location: "الموقع",
     ticketClasses: "فئات التذاكر",
+    status: "الحالة",
+  },
+
+  status: {
+    scheduled: "مجدولة",
+    cancelled: "ملغاة",
   },
 
   form: {
@@ -61,5 +67,16 @@ export const events = {
     title: "حذف الفعالية",
     descriptionPrefix: "سيؤدي هذا إلى حذف فعالية",
     descriptionSuffix: "نهائيًا، مع فئات تذاكرها وصورها. لا يمكن التراجع عن هذا الإجراء.",
+  },
+
+  cancelAction: "إلغاء الفعالية",
+  cancel: {
+    title: "إلغاء الفعالية",
+    descriptionPrefix: "سيؤدي هذا إلى إلغاء فعالية",
+    descriptionSuffix:
+      "واسترداد قيمة كل حجز مدفوع (باستثناء ضريبة القيمة المضافة) للعميل. لا يمكن التراجع عن هذا الإجراء.",
+    confirmButton: "إلغاء الفعالية",
+    cancelling: "جارٍ الإلغاء…",
+    alreadyStarted: "بدأت هذه الفعالية بالفعل ولا يمكن إلغاؤها.",
   },
 } as const;
