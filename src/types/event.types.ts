@@ -26,15 +26,19 @@ export interface EventImage {
 export interface Event {
   id: number;
   title: string;
+  title_ar: string | null;
   description: string;
+  description_ar: string | null;
   start_date: string;
   end_date: string;
   category_id: number;
   category: Category;
   location: string;
+  location_ar: string | null;
   latitude: number;
   longitude: number;
   how_to_get_there: string;
+  how_to_get_there_ar: string | null;
   ticket_classes: TicketClass[];
   images: EventImage[];
   status: EventStatus;
@@ -61,14 +65,18 @@ export interface TicketClassPayload {
 
 export interface CreateEventPayload {
   title: string;
+  title_ar?: string;
   description: string;
+  description_ar?: string;
   start_date: string;
   end_date: string;
   category_id: number;
   location: string;
+  location_ar?: string;
   latitude: number;
   longitude: number;
   how_to_get_there: string;
+  how_to_get_there_ar?: string;
   ticket_classes: TicketClassPayload[];
   image_urls?: string[];
 }
@@ -76,14 +84,18 @@ export interface CreateEventPayload {
 /** If provided, `ticket_classes`/`image_urls` replace the event's full set — see the core app's EventsService. */
 export interface UpdateEventPayload {
   title?: string;
+  title_ar?: string;
   description?: string;
+  description_ar?: string;
   start_date?: string;
   end_date?: string;
   category_id?: number;
   location?: string;
+  location_ar?: string;
   latitude?: number;
   longitude?: number;
   how_to_get_there?: string;
+  how_to_get_there_ar?: string;
   ticket_classes?: TicketClassPayload[];
   image_urls?: string[];
 }

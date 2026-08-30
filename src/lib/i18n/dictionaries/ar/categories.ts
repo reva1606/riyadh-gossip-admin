@@ -17,8 +17,12 @@ export const categories = {
     editDescription: "تحديث اسم الفئة ووصفها.",
     nameLabel: "الاسم",
     namePlaceholder: "مثال: موسيقى",
+    nameArLabel: "الاسم (بالعربية)",
+    nameArPlaceholder: "مثال: موسيقى",
     descriptionLabel: "الوصف",
     descriptionPlaceholder: "اختياري",
+    descriptionArLabel: "الوصف (بالعربية)",
+    descriptionArPlaceholder: "اختياري",
     saveChanges: "حفظ التغييرات",
   },
 

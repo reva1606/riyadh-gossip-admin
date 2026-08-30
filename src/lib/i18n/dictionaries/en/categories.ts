@@ -17,8 +17,12 @@ export const categories = {
     editDescription: "Update this category's name and description.",
     nameLabel: "Name",
     namePlaceholder: "e.g. Music",
+    nameArLabel: "Name (Arabic)",
+    nameArPlaceholder: "e.g. موسيقى",
     descriptionLabel: "Description",
     descriptionPlaceholder: "Optional",
+    descriptionArLabel: "Description (Arabic)",
+    descriptionArPlaceholder: "Optional",
     saveChanges: "Save changes",
   },
 

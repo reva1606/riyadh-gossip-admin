@@ -53,14 +53,18 @@ interface EventFormSheetProps {
 
 const EMPTY_DEFAULTS: EventFormValues = {
   title: "",
+  title_ar: "",
   description: "",
+  description_ar: "",
   start_date: "",
   end_date: "",
   category_id: "",
   location: "",
+  location_ar: "",
   latitude: undefined,
   longitude: undefined,
   how_to_get_there: "",
+  how_to_get_there_ar: "",
   ticket_classes: [{ name: "", price: 0, count: 0 }],
 };
 
@@ -68,14 +72,18 @@ function toDefaultValues(event: Event | null | undefined): EventFormValues {
   if (!event) return EMPTY_DEFAULTS;
   return {
     title: event.title,
+    title_ar: event.title_ar ?? "",
     description: event.description,
+    description_ar: event.description_ar ?? "",
     start_date: event.start_date,
     end_date: event.end_date,
     category_id: String(event.category_id),
     location: event.location,
+    location_ar: event.location_ar ?? "",
     latitude: event.latitude,
     longitude: event.longitude,
     how_to_get_there: event.how_to_get_there,
+    how_to_get_there_ar: event.how_to_get_there_ar ?? "",
     ticket_classes: event.ticket_classes.map((tc) => ({
       id: tc.id,
       name: tc.name,
@@ -117,16 +125,20 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
   function onSubmit(values: EventFormValues) {
     const payload = {
       title: values.title,
+      title_ar: values.title_ar || undefined,
       description: values.description,
+      description_ar: values.description_ar || undefined,
       start_date: values.start_date,
       end_date: values.end_date,
       category_id: Number(values.category_id),
       location: values.location,
+      location_ar: values.location_ar || undefined,
       // Guaranteed set by the form's "pick a location" refinement before
       // handleSubmit ever calls this.
       latitude: values.latitude as number,
       longitude: values.longitude as number,
       how_to_get_there: values.how_to_get_there,
+      how_to_get_there_ar: values.how_to_get_there_ar || undefined,
       ticket_classes: values.ticket_classes,
       image_urls: imageUrls,
     };
@@ -154,33 +166,70 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
         <div className="flex-1 overflow-y-auto px-4 pb-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 pt-4">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("events.form.titleLabel")}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t("events.form.titlePlaceholder")} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("events.form.titleLabel")}</FormLabel>
+                      <FormControl>
+                        <Input placeholder={t("events.form.titlePlaceholder")} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("events.form.descriptionLabel")}</FormLabel>
-                    <FormControl>
-                      <Textarea rows={4} placeholder={t("events.form.descriptionPlaceholder")} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="title_ar"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("events.form.titleArLabel")}</FormLabel>
+                      <FormControl>
+                        <Input dir="rtl" placeholder={t("events.form.titleArPlaceholder")} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("events.form.descriptionLabel")}</FormLabel>
+                      <FormControl>
+                        <Textarea rows={4} placeholder={t("events.form.descriptionPlaceholder")} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description_ar"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("events.form.descriptionArLabel")}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={4}
+                          dir="rtl"
+                          placeholder={t("events.form.descriptionArPlaceholder")}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -261,6 +310,20 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
                 />
               </div>
 
+              <FormField
+                control={form.control}
+                name="location_ar"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("events.form.locationArLabel")}</FormLabel>
+                    <FormControl>
+                      <Input dir="rtl" placeholder={t("events.form.locationArPlaceholder")} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div>
                 <Label>{t("events.form.mapLocationLabel")}</Label>
                 <p className="mb-2 text-xs text-muted-foreground">{t("events.form.mapLocationHelp")}</p>
@@ -330,6 +393,25 @@ export function EventFormSheet({ open, onOpenChange, event }: EventFormSheetProp
                     <FormLabel>{t("events.form.howToGetThereLabel")}</FormLabel>
                     <FormControl>
                       <Textarea rows={3} placeholder={t("events.form.howToGetTherePlaceholder")} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="how_to_get_there_ar"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("events.form.howToGetThereArLabel")}</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        rows={3}
+                        dir="rtl"
+                        placeholder={t("events.form.howToGetThereArPlaceholder")}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

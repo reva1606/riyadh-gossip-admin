@@ -37,17 +37,27 @@ export function CategoryFormDialog({ open, onOpenChange, category }: CategoryFor
 
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
-    defaultValues: { name: "", description: "" },
+    defaultValues: { name: "", name_ar: "", description: "", description_ar: "" },
   });
 
   React.useEffect(() => {
     if (open) {
-      form.reset({ name: category?.name ?? "", description: category?.description ?? "" });
+      form.reset({
+        name: category?.name ?? "",
+        name_ar: category?.name_ar ?? "",
+        description: category?.description ?? "",
+        description_ar: category?.description_ar ?? "",
+      });
     }
   }, [open, category, form]);
 
   function onSubmit(values: CategoryFormValues) {
-    const payload = { name: values.name, description: values.description || undefined };
+    const payload = {
+      name: values.name,
+      name_ar: values.name_ar || undefined,
+      description: values.description || undefined,
+      description_ar: values.description_ar || undefined,
+    };
     if (isEdit && category) {
       updateMutation.mutate({ id: category.id, payload }, { onSuccess: () => onOpenChange(false) });
     } else {
@@ -82,12 +92,38 @@ export function CategoryFormDialog({ open, onOpenChange, category }: CategoryFor
             />
             <FormField
               control={form.control}
+              name="name_ar"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("categories.form.nameArLabel")}</FormLabel>
+                  <FormControl>
+                    <Input dir="rtl" placeholder={t("categories.form.nameArPlaceholder")} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("categories.form.descriptionLabel")}</FormLabel>
                   <FormControl>
                     <Textarea placeholder={t("categories.form.descriptionPlaceholder")} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description_ar"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("categories.form.descriptionArLabel")}</FormLabel>
+                  <FormControl>
+                    <Textarea dir="rtl" placeholder={t("categories.form.descriptionArPlaceholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

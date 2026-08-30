@@ -10,14 +10,18 @@ export const ticketClassSchema = z.object({
 export const eventFormSchema = z
   .object({
     title: z.string().min(1, "Title is required").max(200, "Keep it under 200 characters"),
+    title_ar: z.string().max(200, "Keep it under 200 characters").optional(),
     description: z.string().min(1, "Description is required"),
+    description_ar: z.string().optional(),
     start_date: z.string().min(1, "Start date & time is required"),
     end_date: z.string().min(1, "End date & time is required"),
     category_id: z.string().min(1, "Category is required"),
     location: z.string().min(1, "Location is required").max(500, "Keep it under 500 characters"),
+    location_ar: z.string().max(500, "Keep it under 500 characters").optional(),
     latitude: z.number().min(-90).max(90).optional(),
     longitude: z.number().min(-180).max(180).optional(),
     how_to_get_there: z.string().min(1, "This field is required"),
+    how_to_get_there_ar: z.string().optional(),
     ticket_classes: z.array(ticketClassSchema).min(1, "Add at least one ticket class"),
   })
   .refine((values) => new Date(values.end_date) > new Date(values.start_date), {
